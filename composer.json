@@ -1,0 +1,9 @@
+{
+    "require": {
+        "mjaschen/phpgeo": "^3.2",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "ext-zip": "*",
+        "ext-mbstring": "*"
+    }
+}
