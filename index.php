@@ -32,7 +32,7 @@ $dataDir = __DIR__ . '/data';
 $logFile = __DIR__ . '/lab2gpx.log';
 $tmpDir = sys_get_temp_dir();
 
-function fetch(string $url) : string
+function fetch(string $url): string
 {
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
@@ -50,7 +50,7 @@ function fetch(string $url) : string
     return $data;
 }
 
-function gpxEncode(string $s) : string
+function gpxEncode(string $s): string
 {
     return htmlentities($s, ENT_XML1);
 }
@@ -138,6 +138,12 @@ if (isset($_COOKIE[$cookieName])) {
     $cookieValues = json_decode($_COOKIE[$cookieName], true);
     if ($cookieValues) {
         $values = array_merge($values, $cookieValues);
+        try {
+            $cookieCoordinates = CoordinateFactory::fromString($values['coordinates']);
+            $coordinates = $cookieCoordinates;
+        } catch (Throwable $throwable) {
+            $values['coordinates'] = $coordinates->getLat() . ', ' . $coordinates->getLng();
+        }
     }
 }
 
@@ -506,7 +512,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         document.getElementById('coordinates').value = lat + ', ' + lon;
     });
 
-    function getLocation() {
+    function getLocation () {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(showPosition);
         } else {
@@ -514,7 +520,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    function showPosition(position) {
+    function showPosition (position) {
         document.getElementById('coordinates').value = position.coords.latitude + ', ' + position.coords.longitude;
         if (marker) {
             marker.remove();
