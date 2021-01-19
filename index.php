@@ -98,18 +98,23 @@ if (! is_dir($dataDir)) {
     mkdir($dataDir, 0777, true);
 }
 
+header('Vary: Accept-Language');
 $LANG = [];
 require __DIR__ . '/lang/en.php';
 $knownLangs = ['en', 'de'];
-$userPrefLangs = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
-
-foreach ($userPrefLangs as $idx => $lang) {
-    $lang = substr($lang, 0, 2);
-    if (in_array($lang, $knownLangs)) {
-        require __DIR__ . '/lang/' . $lang . '.php';
-        break;
+$lang = 'en';
+if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+    $userPrefLangs = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+    foreach ($userPrefLangs as $idx => $browserLang) {
+        $browserLang = substr($lang, 0, 2);
+        if (in_array($browserLang, $knownLangs)) {
+            require __DIR__ . '/lang/' . $browserLang . '.php';
+            $lang = $browserLang;
+            break;
+        }
     }
 }
+header('Content-Language: ' . $lang);
 
 $errors = [];
 $cacheTypes = [
@@ -344,12 +349,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-<html>
+<html lang="<?php echo $lang; ?>">
 <!DOCTYPE html>
 <head>
     <title>Lab2Gpx</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, height=device-height, user-scalable=no">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+    <link rel="manifest" href="images/site.webmanifest">
+    <meta name="description" content="<?php echo $LANG['META_DESCRIPTION'] ?>"/>
+    <meta property="og:title" content="Lab2Gpx"/>
+    <meta property="og:description" content="<?php echo $LANG['META_DESCRIPTION'] ?>"/>
+    <meta property="og:image" content="https://gcutils.de/lab2gpx/images/geocaching.png"/>
+    <meta property="og:url" content="https://gcutils.de/lab2gpx/"/>
+    <meta property="og:type" content="website"/>
+
     <link rel="stylesheet" href="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.css"/>
     <style type="text/css">
         html, body {
