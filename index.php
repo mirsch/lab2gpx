@@ -214,6 +214,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <name>Adventure Labs</name>
                 ';
         $id = -1;
+        $usedCodes = [];
         foreach ($fetchedLabs as $cache) {
             $file = $dataDir . '/' . $cache['Id'] . '.json';
             $cache = json_decode(file_get_contents($file), true);
@@ -280,14 +281,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
 
-                $waypointTitle = gpxEncode($cache['Title']) . ' : S' . $stage . ' ' . gpxEncode($wpt['Title']);
+                $displayStage = str_pad((string) $stage, count($cache['GeocacheSummaries']) >= 10 ? 2 : 1, '0', STR_PAD_LEFT);
+
+                $waypointTitle = gpxEncode($cache['Title']) . ' : S' . $displayStage . ' ' . gpxEncode($wpt['Title']);
+                $code = null;
+                $codeCnt = 0;
+                // the firebase link contains upper and lower case letters so there may be collisions if we convert it to upper case
+                while (! $code || (in_array($code, $usedCodes) && $codeCnt < 16)) {
+                    $code = 'LC' . strtoupper(str_replace('https://adventurelab.page.link/', '', $cache['FirebaseDynamicLink'])) . ($codeCnt ? $codeCnt : '') . str_pad((string) $stage, 2, '0', STR_PAD_LEFT);
+                    $codeCnt++;
+                }
+                $usedCodes[] = $code;
 
                 $xml .= '<wpt lat="' . $lat . '" lon="' . $lon . '">
                     <time>' . $cache['PublishedUtc'] . '</time>
-                    <name>LC' . strtoupper(substr(md5($wpt['Id']), 0, 5)) . '</name>
+                    <name>' . $code . '</name>
                     <desc>' . gpxEncode($wpt['Title']) . '</desc>
                     <url>' . $cache['DeepLink'] . '</url>
-                    <urlname>S' . $stage . ' ' . gpxEncode($cache['Title']) . '</urlname>
+                    <urlname>S' . $displayStage . ' ' . gpxEncode($cache['Title']) . '</urlname>
                     <sym>Geocache' . ($found ? ' Found' : '') . '</sym>
                     <type>Geocache|' . $values['cacheType'] . '</type>
                     <groundspeak:cache id="' . $id . '" available="True" archived="False" xmlns:groundspeak="http://www.groundspeak.com/cache/1/0/1">
