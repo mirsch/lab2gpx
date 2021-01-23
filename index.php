@@ -106,7 +106,7 @@ $lang = 'en';
 if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
     $userPrefLangs = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
     foreach ($userPrefLangs as $idx => $browserLang) {
-        $browserLang = substr($lang, 0, 2);
+        $browserLang = substr($browserLang, 0, 2);
         if (in_array($browserLang, $knownLangs)) {
             require __DIR__ . '/lang/' . $browserLang . '.php';
             $lang = $browserLang;
