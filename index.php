@@ -126,6 +126,7 @@ $values = [
     'radius' => 15,
     'take' => 300,
     'cacheType' => $cacheTypes[0],
+    'prefix' => 'LC',
 
     'includeQuestion' => true,
     'includeWaypointDescription' => true,
@@ -179,6 +180,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (! in_array($values['cacheType'], $cacheTypes)) {
         $values['cacheType'] = $cacheTypes[0];
+    }
+
+    if (strlen($values['prefix']) !== 2) {
+        $errors['prefix'] = $LANG['INVALID_PREFIX'];
     }
 
     if (! $errors) {
@@ -296,7 +301,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $codeCnt = 0;
                 // the firebase link contains upper and lower case letters so there may be collisions if we convert it to upper case
                 while (! $code || (in_array($code, $usedCodes) && $codeCnt < 16)) {
-                    $code = 'LC' . strtoupper(str_replace('https://adventurelab.page.link/', '', $cache['FirebaseDynamicLink'])) . ($codeCnt ? $codeCnt : '') . str_pad((string) $stage, 2, '0', STR_PAD_LEFT);
+                    $code = strtoupper($values['prefix']) . strtoupper(str_replace('https://adventurelab.page.link/', '', $cache['FirebaseDynamicLink'])) . ($codeCnt ? $codeCnt : '') . str_pad((string) $stage, 2, '0', STR_PAD_LEFT);
                     $codeCnt++;
                 }
                 $usedCodes[] = $code;
@@ -463,6 +468,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </select>
                 <p><?php echo $LANG['LABEL_HINT_CACHE_TYPE']; ?></p>
             </div>
+
+            <div class="form-row<?php echo(isset($errors['prefix']) ? ' error' : ''); ?>">
+                <label for="take"><?php echo $LANG['LABEL_PREFIX']; ?>:</label>
+                <input type="text" id="prefix" name="prefix" value="<?php echo htmlspecialchars((string) $values['prefix']); ?>"/>
+                <?php if (isset($errors['prefix'])) {
+                    echo '<p class="error">' . $errors['prefix'] . '</p>';
+                } ?>
+            </div>
+
         </fieldset>
 
         <fieldset>

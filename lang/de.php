@@ -57,3 +57,5 @@ $LANG['CURRENT_POSITION'] = 'meine aktuelle Position';
 $LANG['BROWSER_NO_LOCATION'] = 'Geolocation wird von Deinem Browser nicht unterstützt.';
 $LANG['LABEL_INCLUDE_FINDS'] = 'Funde nicht ausschließen sondern als gefunden markieren';
 $LANG['META_DESCRIPTION'] = 'Generiert GPX Dateien (PQ) für Geocaching Adventure Labs';
+$LANG['INVALID_PREFIX'] = 'Der Präfix muss zwei Zeichen lang sein';
+$LANG['LABEL_PREFIX'] = 'Code Präfix';
