@@ -29,9 +29,7 @@ $LANG['HEADER_AWARD'] = 'Award Information';
 $LANG['HEADER_AWARD_MESSAGE'] = 'Award Message';
 $LANG['ERROR_ZIP_FAILED'] = 'Sorry, some thing went wrong. File not created.';
 $LANG['INTRO'] = '
-    <p>This tool generates a GPX file containing Geocaching Adventure Labs for use in Geocaching apps and Garmin GPS devices.</p>
-    <p>Tested on iOS using Cachly App and Garmin Oregon 450.</p>
-    <p>This software is in alpha state and may not work as expected.</p>
+    <p>This tool generates a GPX file containing Geocaching Adventure Labs for use in several Geocaching Apps and Garmin GPS devices.</p>
     <p>The Website stores your settings (except your finds) in a cookie. So don\'t delete this cookie if you want to keep your settings for the next time you use this site.</p>
     <p>If you find bugs or have feature requests, feel free to <a href="https://github.com/mirsch/lab2gpx/issues" target="_blank">open an issue</a>.</p>';
 $LANG['LEGEND_GENERAL'] = 'General';

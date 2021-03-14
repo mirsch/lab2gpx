@@ -25,13 +25,11 @@ $LANG['TAG_LINEAR'] = 'linear';
 $LANG['HEADER_QUESTION'] = 'Frage';
 $LANG['HEADER_WAYPOINT_DESCRIPTION'] = 'Beschreibung der Station';
 $LANG['HEADER_LAB_DESCRIPTION'] = 'Beschreibung des Adventure Labs';
-$LANG['HEADER_AWARD'] = 'Award Information';
-$LANG['HEADER_AWARD_MESSAGE'] = 'Award Text';
+$LANG['HEADER_AWARD'] = 'Tagebucheinträge';
+$LANG['HEADER_AWARD_MESSAGE'] = 'Journal Text';
 $LANG['ERROR_ZIP_FAILED'] = 'Oh, da ging was schief. Datei konnte nicht erzeugt werden.';
 $LANG['INTRO'] = '
-    <p>Dieses Tool generiert eine GPX Datei mit Geocaching Adventure Labs für Geocaching Apps und Garmin GPS Geräte.</p>
-    <p>Getestet unter iOS mit der Cachly App und Garmin Oregon 450.</p>
-    <p>Diese Software befindet sich im Alpha Status und es kann sein, dass nicht alles wie erwartet funktioniert.</p>
+    <p>Dieses Tool generiert eine GPX Datei mit Geocaching Adventure Labs für diverse Geocaching Apps und Garmin GPS Geräte.</p>
     <p>Die Webseite speichert Deine Einstellungen in einem Cookie (außer Deine Funde). Du solltest das Cookie nicht löschen wenn Du Deine Einstellungen für das nächste Mal behalten willst.</p>
     <p>Bei Problemen oder Funktionswünschen kannst Du gern <a href="https://github.com/mirsch/lab2gpx/issues" target="_blank">ein Ticket schreiben</a>.</p>';
 $LANG['LEGEND_GENERAL'] = 'Allgemein';
@@ -46,7 +44,7 @@ $LANG['LABEL_HINT_CACHE_TYPE'] = 'Garmin GPS Geräte unterstützen keine Adventu
 $LANG['LABEL_INCLUDE_QUESTION'] = 'Frage zur Station in Beschreibung einfügen';
 $LANG['LABEL_INCLUDE_DESCRIPTION'] = 'Beschreibung der Station in Cache Beschreibung einfügen';
 $LANG['LABEL_INCLUDE_CACHE_DESCRIPTION'] = 'Beschreibung des Adventure Labs in Cache Beschreibung einfügen';
-$LANG['LABEL_INCLUDE_AWARD'] = 'Award Text in Cache Beschreibung einfügen <i>(kann Spoiler enthalten)</i>';
+$LANG['LABEL_INCLUDE_AWARD'] = 'Tagebucheinträge in Cache Beschreibung einfügen <i>(kann Spoiler enthalten)</i>';
 $LANG['LABEL_EXCLUDE_OWNER'] = 'Owner Name ausschließen (ein Name pro Zeile)';
 $LANG['LABEL_EXCLUDE_FINDS'] = 'Deine Funde ausschließen, Source Code der Seite Deiner Funde kopieren & einfügen';
 $LANG['LABEL_HINT_EXCLUDE_FINDS'] = '
