@@ -121,12 +121,19 @@ $cacheTypes = [
     'Lab Cache',
     'Virtual Cache',
 ];
+$linearTypes = [
+    'default' => $LANG['LINEAR_TYPE_DEFAULT'],
+    'first' => $LANG['LINEAR_TYPE_FIRST'],
+    'mark' => $LANG['LINEAR_TYPE_MARK'],
+    'ignore' => $LANG['LINEAR_TYPE_IGNORE'],
+];
 $values = [
     'coordinates' => 'N50° 50.156 E012° 55.398',
     'radius' => 15,
     'take' => 300,
     'cacheType' => $cacheTypes[0],
     'prefix' => 'LC',
+    'linear' => 'default',
 
     'includeQuestion' => true,
     'includeWaypointDescription' => true,
@@ -186,6 +193,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors['prefix'] = $LANG['INVALID_PREFIX'];
     }
 
+    if (! array_key_exists($values['linear'], $linearTypes)) {
+        $values['linear'] = 'default';
+    }
+
     if (! $errors) {
         $cookieValues = $values;
         unset($cookieValues['findsHtml']);
@@ -229,6 +240,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $file = $dataDir . '/' . $cache['Id'] . '.json';
             $cache = json_decode(file_get_contents($file), true);
             if (! $cache) {
+                continue;
+            }
+
+            if ($cache['IsLinear'] && $values['linear'] === 'ignore') {
                 continue;
             }
 
@@ -297,6 +312,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $displayStage = str_pad((string) $stage, count($cache['GeocacheSummaries']) >= 10 ? 2 : 1, '0', STR_PAD_LEFT);
 
                 $waypointTitle = gpxEncode($cache['Title']) . ' : S' . $displayStage . ' ' . gpxEncode($wpt['Title']);
+                if ($cache['IsLinear'] && $values['linear'] === 'mark') {
+                    $waypointTitle = '[linear] ' . $waypointTitle;
+                }
                 $code = null;
                 $codeCnt = 0;
                 // the firebase link contains upper and lower case letters so there may be collisions if we convert it to upper case
@@ -334,6 +352,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </wpt>';
                 $stage++;
                 $id--;
+
+                if ($cache['IsLinear'] && $values['linear'] === 'first') {
+                    break;
+                }
             }
         }
 
@@ -475,6 +497,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php if (isset($errors['prefix'])) {
                     echo '<p class="error">' . $errors['prefix'] . '</p>';
                 } ?>
+            </div>
+
+            <div class="form-row">
+                <label for="cacheType"><?php echo $LANG['LABEL_LINEAR']; ?></label>
+                <select name="linear" id="linear">
+                    <?php
+                    foreach ($linearTypes as $type => $label) {
+                        echo '<option value="' . $type . '"' . ($values['linear'] === $type ? ' selected="selected"' : '') . '>' . $label . '</option>';
+                    }
+                    ?>
+                </select>
             </div>
 
         </fieldset>
