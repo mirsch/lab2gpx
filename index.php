@@ -125,6 +125,7 @@ $linearTypes = [
     'default' => $LANG['LINEAR_TYPE_DEFAULT'],
     'first' => $LANG['LINEAR_TYPE_FIRST'],
     'mark' => $LANG['LINEAR_TYPE_MARK'],
+    'corrected' => $LANG['LINEAR_TYPE_CORRECTED'],
     'ignore' => $LANG['LINEAR_TYPE_IGNORE'],
 ];
 $values = [
@@ -331,8 +332,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <url>' . $cache['DeepLink'] . '</url>
                     <urlname>S' . $displayStage . ' ' . gpxEncode($cache['Title']) . '</urlname>
                     <sym>Geocache' . ($found ? ' Found' : '') . '</sym>
-                    <type>Geocache|' . $values['cacheType'] . '</type>
-                    <groundspeak:cache id="' . $id . '" available="True" archived="False" xmlns:groundspeak="http://www.groundspeak.com/cache/1/0/1">
+                    <type>Geocache|' . $values['cacheType'] . '</type>';
+                if ($values['linear'] === 'corrected' && $cache['IsLinear']) {
+                    $xml .= '<gsak:wptExtension xmlns:gsak="http://www.gsak.net/xmlv1/5">
+                        <gsak:Code>' . $code . '</gsak:Code>
+                        <gsak:IsPremium>false</gsak:IsPremium>
+                        <gsak:FavPoints>0</gsak:FavPoints>
+                        <gsak:UserFlag>false</gsak:UserFlag>
+                        <gsak:DNF>false</gsak:DNF>
+                        <gsak:FTF>false</gsak:FTF>
+                        <gsak:LatBeforeCorrect>' . $lat . '</gsak:LatBeforeCorrect>
+                        <gsak:LonBeforeCorrect>' . $lon . '</gsak:LonBeforeCorrect>
+                    </gsak:wptExtension>';
+                }
+                $xml .= '<groundspeak:cache id="' . $id . '" available="True" archived="False" xmlns:groundspeak="http://www.groundspeak.com/cache/1/0/1">
                         <groundspeak:name>' . $waypointTitle . '</groundspeak:name>
                         <groundspeak:placed_by>' . gpxEncode($cache['OwnerUsername']) . '</groundspeak:placed_by>
                         <groundspeak:owner>' . gpxEncode($cache['OwnerUsername']) . '</groundspeak:owner>

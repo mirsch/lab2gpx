@@ -63,4 +63,5 @@ $LANG['LABEL_LINEAR'] = 'Linear Adventure Labs';
 $LANG['LINEAR_TYPE_DEFAULT'] = 'Default';
 $LANG['LINEAR_TYPE_FIRST'] = 'Include only first/next station';
 $LANG['LINEAR_TYPE_MARK'] = 'Mark using [linear] in title';
+$LANG['LINEAR_TYPE_CORRECTED'] = 'As corrected coordinates';
 $LANG['LINEAR_TYPE_IGNORE'] = 'Ignore';
