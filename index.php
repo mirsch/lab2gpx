@@ -31,6 +31,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 $dataDir = __DIR__ . '/data';
 $logFile = __DIR__ . '/lab2gpx.log';
 $tmpDir = sys_get_temp_dir();
+define('CACHE_LIFE_TIME_IN_SECONDS', 24 * 60 * 60);
 
 function fetch(string $url): string
 {
@@ -77,7 +78,7 @@ function fetchLabs(Coordinate $coordinates, array $values, array &$fetchedLabs, 
             return;
         }
         $file = $dataDir . '/' . $cache['Id'] . '.json';
-        if (file_exists($file)) { // @todo we should refetch from time to time because there may be changes
+        if (file_exists($file) && filemtime($file) > time() - CACHE_LIFE_TIME_IN_SECONDS) {
             $fetchedLabs[] = $cache;
             continue;
         }
@@ -314,7 +315,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $waypointTitle = gpxEncode($cache['Title']) . ' : S' . $displayStage . ' ' . gpxEncode($wpt['Title']);
                 if ($cache['IsLinear'] && $values['linear'] === 'mark') {
-                    $waypointTitle = '[linear] ' . $waypointTitle;
+                    $waypointTitle = '[L] ' . $waypointTitle;
                 }
                 $code = null;
                 $codeCnt = 0;
