@@ -129,6 +129,11 @@ $linearTypes = [
     'corrected' => $LANG['LINEAR_TYPE_CORRECTED'],
     'ignore' => $LANG['LINEAR_TYPE_IGNORE'],
 ];
+$outputFormats = [
+    'zippedgpx' => $LANG['OUTPUT_ZIPPED_GPX'],
+    'gpx' => $LANG['OUTPUT_GPX'],
+    'cacheturdotno' => $LANG['OUTPUT_CACHETUR_DOT_NO'],
+];
 $values = [
     'coordinates' => 'N50° 50.156 E012° 55.398',
     'radius' => 15,
@@ -145,6 +150,8 @@ $values = [
     'excludeOwner' => '',
     'findsHtml' => '',
     'includeFinds' => false,
+
+    'outputFormat' => 'zippedgpx',
 ];
 $coordinates = CoordinateFactory::fromString($values['coordinates']);
 
@@ -199,6 +206,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $values['linear'] = 'default';
     }
 
+    if (! array_key_exists($values['outputFormat'], $outputFormats)) {
+        $values['linear'] = 'zippedgpx';
+    }
+
     if (! $errors) {
         $cookieValues = $values;
         unset($cookieValues['findsHtml']);
@@ -236,6 +247,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <gpx xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" creator="Groundspeak Pocket Query" xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd http://www.groundspeak.com/cache/1/0/1 http://www.groundspeak.com/cache/1/0/1/cache.xsd" xmlns="http://www.topografix.com/GPX/1/0">
                     <name>Adventure Labs</name>
                 ';
+        $cacheturDotNo = '';
         $id = -1;
         $usedCodes = [];
         foreach ($fetchedLabs as $cache) {
@@ -313,7 +325,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $displayStage = str_pad((string) $stage, count($cache['GeocacheSummaries']) >= 10 ? 2 : 1, '0', STR_PAD_LEFT);
 
-                $waypointTitle = gpxEncode($cache['Title']) . ' : S' . $displayStage . ' ' . gpxEncode($wpt['Title']);
+                $waypointTitle = $cache['Title'] . ' : S' . $displayStage . ' ' . $wpt['Title'];
                 if ($cache['IsLinear'] && $values['linear'] === 'mark') {
                     $waypointTitle = '[L] ' . $waypointTitle;
                 }
@@ -347,7 +359,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </gsak:wptExtension>';
                 }
                 $xml .= '<groundspeak:cache id="' . $id . '" available="True" archived="False" xmlns:groundspeak="http://www.groundspeak.com/cache/1/0/1">
-                        <groundspeak:name>' . $waypointTitle . '</groundspeak:name>
+                        <groundspeak:name>' . gpxEncode($waypointTitle) . '</groundspeak:name>
                         <groundspeak:placed_by>' . gpxEncode($cache['OwnerUsername']) . '</groundspeak:placed_by>
                         <groundspeak:owner>' . gpxEncode($cache['OwnerUsername']) . '</groundspeak:owner>
                         <groundspeak:type>' . $values['cacheType'] . '</groundspeak:type>
@@ -364,6 +376,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <groundspeak:travelbugs />
                     </groundspeak:cache>
                 </wpt>';
+
+                $coordinate = new Coordinate($lat, $lon);
+                $formatter = new \App\DecimalMinutes();
+                $cacheturDotNo .= $code . ';lab;' . $coordinate->format($formatter) . ';' . $waypointTitle . "\n";
+
                 $stage++;
                 $id--;
 
@@ -375,21 +392,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $xml .= '</gpx>';
 
-        $zip = new ZipArchive;
-        $tmpFile = tempnam($tmpDir, 'lab2gpx');
-        if (! $zip->open($tmpFile, ZipArchive::CREATE)) {
-            echo $LANG['ERROR_ZIP_FAILED'];
+        if ($values['outputFormat'] === 'zippedgpx') {
+            $zip = new ZipArchive;
+            $tmpFile = tempnam($tmpDir, 'lab2gpx');
+            if (! $zip->open($tmpFile, ZipArchive::CREATE)) {
+                echo $LANG['ERROR_ZIP_FAILED'];
+                exit;
+            }
+            $zip->addFromString('labs2gpx.gpx', $xml);
+            $zip->close();
+            header("Content-type: application/zip");
+            header("Content-Disposition: attachment; filename=labs2gpx.zip");
+            header("Content-length: " . filesize($tmpFile));
+            header("Pragma: no-cache");
+            header("Expires: 0");
+            readfile($tmpFile);
             exit;
         }
-        $zip->addFromString('labs2gpx.gpx', $xml);
-        $zip->close();
-        header("Content-type: application/zip");
-        header("Content-Disposition: attachment; filename=labs2gpx.zip");
-        header("Content-length: " . filesize($tmpFile));
-        header("Pragma: no-cache");
-        header("Expires: 0");
-        readfile($tmpFile);
-        exit;
+        if ($values['outputFormat'] === 'gpx') {
+            header("Content-type: application/gpx+xml");
+            header("Content-Disposition: attachment; filename=labs2gpx.gpx");
+            header("Content-length: " . strlen($xml));
+            header("Pragma: no-cache");
+            header("Expires: 0");
+            echo $xml;
+            exit;
+        }
+        if ($values['outputFormat'] === 'cacheturdotno') {
+            header("Content-type: text/csv");
+            header("Content-Disposition: attachment; filename=labs2gpx.csv");
+            header("Content-length: " . strlen($cacheturDotNo));
+            header("Pragma: no-cache");
+            header("Expires: 0");
+            echo $cacheturDotNo;
+            exit;
+        }
     }
 }
 ?>
@@ -575,7 +612,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </fieldset>
 
-        <input type="submit" name="downloadButton" id="downloadButton" value="<?php echo $LANG['LABEL_DOWNLOAD_GPX']; ?>"/> <strong><?php echo $LANG['LABEL_HINT_DOWNLOAD_GPX']; ?></strong>
+        <fieldset>
+            <legend><?php echo $LANG['LEGEND_DOWNLOAD']; ?></legend>
+            <div class="form-row">
+                <label for="outputFormat"><?php echo $LANG['LABEL_OUTPUT_FORMAT']; ?></label>
+                <select name="outputFormat" id="outputFormat">
+                    <?php
+                    foreach ($outputFormats as $format => $label) {
+                        echo '<option value="' . $format . '"' . ($values['outputFormat'] === $format ? ' selected="selected"' : '') . '>' . $label . '</option>';
+                    }
+                    ?>
+                </select>
+            </div>
+
+            <input type="submit" name="downloadButton" id="downloadButton" value="<?php echo $LANG['LABEL_DOWNLOAD']; ?>"/> <strong><?php echo $LANG['LABEL_HINT_DOWNLOAD']; ?></strong>
+        </fieldset>
+
     </form>
 </div>
 

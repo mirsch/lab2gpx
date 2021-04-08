@@ -35,6 +35,7 @@ $LANG['INTRO'] = '
 $LANG['LEGEND_GENERAL'] = 'Allgemein';
 $LANG['LEGEND_DESCRIPTION'] = 'Beschreibung';
 $LANG['LEGEND_EXCLUDE'] = 'Ausschließen';
+$LANG['LEGEND_DOWNLOAD'] = 'Download';
 $LANG['LABEL_COORDINATES'] = 'Koordinaten z.B. 50.83593, 12.92329 oder N50° 50.156 E012° 55.397';
 $LANG['LABEL_MAP'] = 'Oder klicke auf die Karte um eine Position zu wählen.';
 $LANG['LABEL_RADIUS'] = 'Radius in km';
@@ -50,8 +51,8 @@ $LANG['LABEL_EXCLUDE_FINDS'] = 'Deine Funde ausschließen, Source Code der Seite
 $LANG['LABEL_HINT_EXCLUDE_FINDS'] = '
     Gehe zu <a href="https://labs.geocaching.com/logs" target="_blank">https://labs.geocaching.com/logs</a> und logge Dich ein, so dass Du Deine Logs sehen kannst.
     Wähle in Deinem Browser "Quelltext anzeigen" und kopiere den gesamten Quelltext in dieses Feld.';
-$LANG['LABEL_DOWNLOAD_GPX'] = 'Download GPX';
-$LANG['LABEL_HINT_DOWNLOAD_GPX'] = 'Das kann eine Weile dauern. Bitte habe Geduld und klicke nur ein mal.';
+$LANG['LABEL_DOWNLOAD'] = 'Download';
+$LANG['LABEL_HINT_DOWNLOAD'] = 'Das kann eine Weile dauern. Bitte habe Geduld und klicke nur ein mal.';
 $LANG['NO_CACHES_FOUND'] = '<p>Ooops, an den Koordinaten wurden keine Caches gefunden.</p><p><a href="/lab2gpx/">zurück</a></p>';
 $LANG['CURRENT_POSITION'] = 'meine aktuelle Position';
 $LANG['BROWSER_NO_LOCATION'] = 'Geolocation wird von Deinem Browser nicht unterstützt.';
@@ -65,3 +66,7 @@ $LANG['LINEAR_TYPE_FIRST'] = 'Nur die erste/nächste Station';
 $LANG['LINEAR_TYPE_MARK'] = 'Markieren mit [L] im Namen';
 $LANG['LINEAR_TYPE_CORRECTED'] = 'als korrigierte Koordinaten';
 $LANG['LINEAR_TYPE_IGNORE'] = 'Ausschließen';
+$LANG['LABEL_OUTPUT_FORMAT'] = 'Ausgabeformat';
+$LANG['OUTPUT_ZIPPED_GPX'] = 'Gezipptes GPX';
+$LANG['OUTPUT_GPX'] = 'GPX';
+$LANG['OUTPUT_CACHETUR_DOT_NO'] = 'Cachetur.no Bulk Add Waypoints';
