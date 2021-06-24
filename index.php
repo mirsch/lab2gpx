@@ -27,6 +27,9 @@ use Location\Factory\CoordinateFactory;
 // error_reporting(E_ALL);
 
 require_once __DIR__ . '/vendor/autoload.php';
+const IN_APP = true;
+$config['CONSUMER_KEY'] = 'THE-TOP-SECRET-CONSUMER-KEY';
+require_once __DIR__ . '/config.local.php';
 
 $dataDir = __DIR__ . '/data';
 $logFile = __DIR__ . '/lab2gpx.log';
@@ -35,14 +38,33 @@ define('CACHE_LIFE_TIME_IN_SECONDS', 24 * 60 * 60);
 
 function fetch(string $url): string
 {
+    global $config;
+
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_USERAGENT, 'Adventures/1.2.27 (2192) (ios/14.1)');
+    curl_setopt($ch, CURLOPT_USERAGENT, 'Adventures/1.3.4 (2408) (ios/14.6)');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept' => 'application/json']);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Accept: application/json',
+        'x-consumer-key: ' . $config['CONSUMER_KEY'],
+    ]);
+
+    /*
+    curl_setopt($ch, CURLOPT_VERBOSE, true);
+    $verbose = fopen('php://temp', 'w+');
+    curl_setopt($ch, CURLOPT_STDERR, $verbose);
+    */
 
     $data = curl_exec($ch);
+
+    /*
+    rewind($verbose);
+    $verboseLog = stream_get_contents($verbose);
+    echo "Verbose information:\n<pre>", htmlspecialchars($verboseLog), "</pre>\n";
+    exit;
+    */
+
     if ($data === false) {
         throw new UnexpectedValueException(curl_error($ch));
     }
