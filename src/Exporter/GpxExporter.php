@@ -2,13 +2,59 @@
 
 namespace App\Exporter;
 
-use Location\Coordinate;
-
 class GpxExporter extends AbstractExporter
 {
     protected function gpxEncode(string $s): string
     {
         return htmlentities($s, ENT_XML1);
+    }
+
+    protected function getWaypointDescription(array $cache, array $values, array $wpt): string
+    {
+        $description = '<h3>' . $cache['Title'] . '</h3>';
+        if (isset($wpt['Title'])) {
+            $description .= '<h4>' . $wpt['Title'] . '</h4>';
+        }
+        if ($cache['IsLinear']) {
+            $description .= '<p><span style="background:#990000;color:#fff;border-radius:5px;padding:3px 5px;">' . $this->locale['TAG_LINEAR'] . '</span></p>';
+        }
+        $description .= '<p><a href="' . $cache['DeepLink'] . '">' . $cache['DeepLink'] . '</a></p>';
+
+        if ($values['includeQuestion'] && isset($wpt['Question'])) {
+            $description .= '<p>' . $this->locale['HEADER_QUESTION'] . ':<br />' . $wpt['Question'] . '</p>';
+        }
+
+        if ($values['includeWaypointDescription'] && isset($wpt['Description'])) {
+            $description .= '<hr />';
+            $description .= '<h5>' . $this->locale['HEADER_WAYPOINT_DESCRIPTION'] . '</h5>';
+            $description .= '<p><img src="' . $wpt['KeyImageUrl'] . '" /></p>';
+            $description .= '<p>' . $wpt['Description'] . '</p>';
+        }
+
+        if ($values['includeCacheDescription']) {
+            $description .= '<hr />';
+            $description .= '<h5>' . $this->locale['HEADER_LAB_DESCRIPTION'] . '</h5>';
+            $description .= '<p><img src="' . $cache['KeyImageUrl'] . '" /></p>';
+            $description .= '<p>' . $cache['Description'] . '</p>';
+        }
+
+        if ($values['includeAwardMessage'] && $wpt) {
+            if ($wpt['AwardImageUrl'] || $wpt['CompletionAwardMessage']) {
+                $description .= '<hr />';
+                $description .= '<h5>' . $this->locale['HEADER_AWARD'] . '</h5>';
+            }
+            if ($wpt['AwardImageUrl']) {
+                $description .= '<p><img src="' . $wpt['AwardImageUrl'] . '" /></p>';
+            }
+            if ($wpt['CompletionAwardMessage']) {
+                $description .= '<p>' . $this->locale['HEADER_AWARD_MESSAGE'] . ':<br />' . $wpt['CompletionAwardMessage'] . '</p>';
+            }
+        }
+
+        // remove non printable chars https://github.com/mirsch/lab2gpx/issues/10
+        $description = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $description);
+
+        return $description;
     }
 
     public function export(array $fetchedLabs, array $values, array $ownersToSkip, array $finds): string
@@ -35,46 +81,7 @@ class GpxExporter extends AbstractExporter
                 $lat = $wpt['Location']['Latitude'];
                 $lon = $wpt['Location']['Longitude'];
 
-                $description = '<h3>' . $cache['Title'] . '</h3>';
-                $description .= '<h4>' . $wpt['Title'] . '</h4>';
-                if ($cache['IsLinear']) {
-                    $description .= '<p><span style="background:#990000;color:#fff;border-radius:5px;padding:3px 5px;">' . $this->locale['TAG_LINEAR'] . '</span></p>';
-                }
-                $description .= '<p><a href="' . $cache['DeepLink'] . '">' . $cache['DeepLink'] . '</a></p>';
-
-                if ($values['includeQuestion']) {
-                    $description .= '<p>' . $this->locale['HEADER_QUESTION'] . ':<br />' . $wpt['Question'] . '</p>';
-                }
-
-                if ($values['includeWaypointDescription']) {
-                    $description .= '<hr />';
-                    $description .= '<h5>' . $this->locale['HEADER_WAYPOINT_DESCRIPTION'] . '</h5>';
-                    $description .= '<p><img src="' . $wpt['KeyImageUrl'] . '" /></p>';
-                    $description .= '<p>' . $wpt['Description'] . '</p>';
-                }
-
-                if ($values['includeCacheDescription']) {
-                    $description .= '<hr />';
-                    $description .= '<h5>' . $this->locale['HEADER_LAB_DESCRIPTION'] . '</h5>';
-                    $description .= '<p><img src="' . $cache['KeyImageUrl'] . '" /></p>';
-                    $description .= '<p>' . $cache['Description'] . '</p>';
-                }
-
-                if ($values['includeAwardMessage']) {
-                    if ($wpt['AwardImageUrl'] || $wpt['CompletionAwardMessage']) {
-                        $description .= '<hr />';
-                        $description .= '<h5>' . $this->locale['HEADER_AWARD'] . '</h5>';
-                    }
-                    if ($wpt['AwardImageUrl']) {
-                        $description .= '<p><img src="' . $wpt['AwardImageUrl'] . '" /></p>';
-                    }
-                    if ($wpt['CompletionAwardMessage']) {
-                        $description .= '<p>' . $this->locale['HEADER_AWARD_MESSAGE'] . ':<br />' . $wpt['CompletionAwardMessage'] . '</p>';
-                    }
-                }
-
-                // remove non printable chars https://github.com/mirsch/lab2gpx/issues/10
-                $description = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $description);
+                $description = $this->getWaypointDescription($cache, $values, $wpt);
 
                 $displayStage = $this->getStageForDisplay($stage, $cache);
 

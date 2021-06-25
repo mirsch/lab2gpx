@@ -70,4 +70,6 @@ $LANG['LINEAR_TYPE_IGNORE'] = 'Ignore';
 $LANG['LABEL_OUTPUT_FORMAT'] = 'Output format';
 $LANG['OUTPUT_ZIPPED_GPX'] = 'Zipped GPX';
 $LANG['OUTPUT_GPX'] = 'GPX';
+$LANG['OUTPUT_GPX_WPT'] = 'GPX with Waypoints';
+$LANG['OUTPUT_ZIPPED_GPX_WPT'] = 'Zipped GPX with Waypoints';
 $LANG['OUTPUT_CACHETUR_DOT_NO'] = 'Cachetur.no Bulk Add Waypoints';

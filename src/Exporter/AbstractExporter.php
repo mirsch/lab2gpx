@@ -68,9 +68,15 @@ abstract class AbstractExporter
         return $waypointTitle;
     }
 
-    protected function getCode(array $cache, array $values, int $stage): string
+    protected function getCode(array $cache, array $values, int $stage, bool $useStageAsPrefix = false): string
     {
         $code = '';
+        $stage = $stage ? str_pad((string) $stage, 2, '0', STR_PAD_LEFT) : 0;
+        $prefix = $values['prefix'];
+        if ($useStageAsPrefix) {
+            $prefix = $stage;
+            $stage = 0;
+        }
         $codeCnt = 0;
         // the firebase link contains upper and lower case letters so there may be collisions if we convert it to upper case
         $fixedPart = str_replace('https://adventurelab.page.link/', '', $cache['FirebaseDynamicLink']);
@@ -78,7 +84,10 @@ abstract class AbstractExporter
             $fixedPart = strtoupper($fixedPart);
         }
         while (! $code || (in_array($code, $this->usedCodes) && $codeCnt < 16)) {
-            $code = strtoupper($values['prefix']) . $fixedPart . ($codeCnt ? $codeCnt : '') . str_pad((string) $stage, 2, '0', STR_PAD_LEFT);
+            $code = strtoupper($prefix) . $fixedPart . ($codeCnt ? $codeCnt : '');
+            if ($stage) {
+                $code .= $stage;
+            }
             $codeCnt++;
         }
         $this->usedCodes[] = $code;

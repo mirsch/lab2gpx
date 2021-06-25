@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 use App\Exporter\CacheturDotNoExporter;
 use App\Exporter\GpxExporter;
+use App\Exporter\GpxWaypointExporter;
 use Location\Coordinate;
 use Location\Factory\CoordinateFactory;
 
@@ -145,6 +146,8 @@ $linearTypes = [
 $outputFormats = [
     'zippedgpx' => $LANG['OUTPUT_ZIPPED_GPX'],
     'gpx' => $LANG['OUTPUT_GPX'],
+    'zippedgpxwpt' => $LANG['OUTPUT_ZIPPED_GPX_WPT'],
+    'gpxwpt' => $LANG['OUTPUT_GPX_WPT'],
     'cacheturdotno' => $LANG['OUTPUT_CACHETUR_DOT_NO'],
 ];
 $values = [
@@ -261,7 +264,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         switch ($values['outputFormat']) {
             case 'zippedgpx':
-                $exporter = new GpxExporter($dataDir, $LANG);
+            case 'zippedgpxwpt':
+                if ($values['outputFormat'] === 'zippedgpxwpt') {
+                    $exporter = new GpxWaypointExporter($dataDir, $LANG);
+                } else {
+                    $exporter = new GpxExporter($dataDir, $LANG);
+                }
                 $zip = new ZipArchive;
                 $tmpFile = tempnam($tmpDir, 'lab2gpx');
                 if (! $zip->open($tmpFile, ZipArchive::CREATE)) {
@@ -279,7 +287,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 readfile($tmpFile);
                 exit;
             case 'gpx':
-                $exporter = new GpxExporter($dataDir, $LANG);
+            case 'gpxwpt':
+                if ($values['outputFormat'] === 'gpxwpt') {
+                    $exporter = new GpxWaypointExporter($dataDir, $LANG);
+                } else {
+                    $exporter = new GpxExporter($dataDir, $LANG);
+                }
                 $xml = $exporter->export($fetchedLabs, $values, $ownersToSkip, $finds);
                 header("Content-type: application/gpx+xml");
                 header("Content-Disposition: attachment; filename=labs2gpx.gpx");
