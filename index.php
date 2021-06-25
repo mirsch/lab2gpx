@@ -373,7 +373,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 <div class="page">
     <?php echo $LANG['INTRO']; ?>
-    <form method="post" onsubmit="downloadButton.disabled = true; return true;">
+    <form method="post">
         <fieldset>
             <legend><?php echo $LANG['LEGEND_GENERAL']; ?></legend>
             <div class="form-row<?php echo(isset($errors['coordinates']) ? ' error' : ''); ?>">
