@@ -20,6 +20,8 @@
 
 declare(strict_types=1);
 
+use App\Exporter\CacheturDotNoExporter;
+use App\Exporter\GpxExporter;
 use Location\Coordinate;
 use Location\Factory\CoordinateFactory;
 
@@ -29,6 +31,7 @@ use Location\Factory\CoordinateFactory;
 require_once __DIR__ . '/vendor/autoload.php';
 const IN_APP = true;
 $config['CONSUMER_KEY'] = 'THE-TOP-SECRET-CONSUMER-KEY';
+$config['enable_logging'] = false;
 require_once __DIR__ . '/config.local.php';
 
 $dataDir = __DIR__ . '/data';
@@ -50,20 +53,7 @@ function fetch(string $url): string
         'x-consumer-key: ' . $config['CONSUMER_KEY'],
     ]);
 
-    /*
-    curl_setopt($ch, CURLOPT_VERBOSE, true);
-    $verbose = fopen('php://temp', 'w+');
-    curl_setopt($ch, CURLOPT_STDERR, $verbose);
-    */
-
     $data = curl_exec($ch);
-
-    /*
-    rewind($verbose);
-    $verboseLog = stream_get_contents($verbose);
-    echo "Verbose information:\n<pre>", htmlspecialchars($verboseLog), "</pre>\n";
-    exit;
-    */
 
     if ($data === false) {
         throw new UnexpectedValueException(curl_error($ch));
@@ -71,11 +61,6 @@ function fetch(string $url): string
     curl_close($ch);
 
     return $data;
-}
-
-function gpxEncode(string $s): string
-{
-    return htmlentities($s, ENT_XML1);
 }
 
 function fetchLabs(Coordinate $coordinates, array $values, array &$fetchedLabs, $skip = 0)
@@ -94,6 +79,8 @@ function fetchLabs(Coordinate $coordinates, array $values, array &$fetchedLabs, 
         echo $LANG['NO_CACHES_FOUND'];
         exit;
     }
+    $file = $dataDir . '/search_' . md5($url) . '.json';
+    file_put_contents($file, json_encode($labCaches, JSON_PRETTY_PRINT));
 
     foreach ($labCaches['Items'] as $cache) {
         if (count($fetchedLabs) >= $max) {
@@ -126,7 +113,11 @@ $LANG = [];
 require __DIR__ . '/lang/en.php';
 $knownLangs = ['en', 'de'];
 $lang = 'en';
-if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+if (isset($_GET['L']) && in_array($_GET['L'], $knownLangs)) {
+    require __DIR__ . '/lang/' . $_GET['L'] . '.php';
+    $lang = $_GET['L'];
+}
+if (! isset($_GET['L']) && isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
     $userPrefLangs = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
     foreach ($userPrefLangs as $idx => $browserLang) {
         $browserLang = substr($browserLang, 0, 2);
@@ -237,7 +228,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         unset($cookieValues['findsHtml']);
         setcookie($cookieName, json_encode($cookieValues), time() + 999999);
 
-        // file_put_contents($logFile, (new DateTimeImmutable())->format('Y-m-d H:i:s') . "\t" . $_SERVER['REMOTE_ADDR'] . "\t" . json_encode($cookieValues) . "\n", FILE_APPEND);
+        if ($config['enable_logging']) {
+            file_put_contents($logFile, (new DateTimeImmutable())->format('Y-m-d H:i:s') . "\t" . $_SERVER['REMOTE_ADDR'] . "\t" . json_encode($cookieValues) . "\n", FILE_APPEND);
+        }
 
         // fetch data
         $fetchedLabs = [];
@@ -265,189 +258,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        $xml = '<?xml version="1.0" encoding="utf-8"?>
-                <gpx xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" creator="Groundspeak Pocket Query" xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd http://www.groundspeak.com/cache/1/0/1 http://www.groundspeak.com/cache/1/0/1/cache.xsd" xmlns="http://www.topografix.com/GPX/1/0">
-                    <name>Adventure Labs</name>
-                ';
-        $cacheturDotNo = '';
-        $id = -1;
-        $usedCodes = [];
-        foreach ($fetchedLabs as $cache) {
-            $file = $dataDir . '/' . $cache['Id'] . '.json';
-            $cache = json_decode(file_get_contents($file), true);
-            if (! $cache) {
-                continue;
-            }
-
-            if ($cache['IsLinear'] && $values['linear'] === 'ignore') {
-                continue;
-            }
-
-            if (in_array($cache['OwnerUsername'], $ownersToSkip)) {
-                continue;
-            }
-
-            $stage = 1;
-            foreach ($cache['GeocacheSummaries'] as $wpt) {
-
-                $found = false;
-                if (isset($finds[$cache['Id']])) {
-                    if (in_array(trim($wpt['Title']), $finds[$cache['Id']])) {
-                        $found = true;
-                        if (! $values['includeFinds']) {
-                            $stage++;
-                            continue;
-                        }
-                    }
+        switch ($values['outputFormat']) {
+            case 'zippedgpx':
+                $exporter = new GpxExporter($dataDir, $LANG);
+                $zip = new ZipArchive;
+                $tmpFile = tempnam($tmpDir, 'lab2gpx');
+                if (! $zip->open($tmpFile, ZipArchive::CREATE)) {
+                    echo $LANG['ERROR_ZIP_FAILED'];
+                    exit;
                 }
-
-                $lat = $wpt['Location']['Latitude'];
-                $lon = $wpt['Location']['Longitude'];
-
-                $description = '<h3>' . $cache['Title'] . '</h3>';
-                $description .= '<h4>' . $wpt['Title'] . '</h4>';
-                if ($cache['IsLinear']) {
-                    $description .= '<p><span style="background:#990000;color:#fff;border-radius:5px;padding:3px 5px;">' . $LANG['TAG_LINEAR'] . '</span></p>';
-                }
-                $description .= '<p><a href="' . $cache['DeepLink'] . '">' . $cache['DeepLink'] . '</a></p>';
-
-                if ($values['includeQuestion']) {
-                    $description .= '<p>' . $LANG['HEADER_QUESTION'] . ':<br />' . $wpt['Question'] . '</p>';
-                }
-
-                if ($values['includeWaypointDescription']) {
-                    $description .= '<hr />';
-                    $description .= '<h5>' . $LANG['HEADER_WAYPOINT_DESCRIPTION'] . '</h5>';
-                    $description .= '<p><img src="' . $wpt['KeyImageUrl'] . '" /></p>';
-                    $description .= '<p>' . $wpt['Description'] . '</p>';
-                }
-
-                if ($values['includeCacheDescription']) {
-                    $description .= '<hr />';
-                    $description .= '<h5>' . $LANG['HEADER_LAB_DESCRIPTION'] . '</h5>';
-                    $description .= '<p><img src="' . $cache['KeyImageUrl'] . '" /></p>';
-                    $description .= '<p>' . $cache['Description'] . '</p>';
-                }
-
-                if ($values['includeAwardMessage']) {
-                    if ($wpt['AwardImageUrl'] || $wpt['CompletionAwardMessage']) {
-                        $description .= '<hr />';
-                        $description .= '<h5>' . $LANG['HEADER_AWARD'] . '</h5>';
-                    }
-                    if ($wpt['AwardImageUrl']) {
-                        $description .= '<p><img src="' . $wpt['AwardImageUrl'] . '" /></p>';
-                    }
-                    if ($wpt['CompletionAwardMessage']) {
-                        $description .= '<p>' . $LANG['HEADER_AWARD_MESSAGE'] . ':<br />' . $wpt['CompletionAwardMessage'] . '</p>';
-                    }
-                }
-
-                // remove non printable chars https://github.com/mirsch/lab2gpx/issues/10
-                $description = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $description);
-
-                $displayStage = str_pad((string) $stage, count($cache['GeocacheSummaries']) >= 10 ? 2 : 1, '0', STR_PAD_LEFT);
-
-                $waypointTitle = $cache['Title'] . ' : S' . $displayStage . ' ' . $wpt['Title'];
-                if ($cache['IsLinear'] && $values['linear'] === 'mark') {
-                    $waypointTitle = '[L] ' . $waypointTitle;
-                }
-                $code = null;
-                $codeCnt = 0;
-                // the firebase link contains upper and lower case letters so there may be collisions if we convert it to upper case
-                while (! $code || (in_array($code, $usedCodes) && $codeCnt < 16)) {
-                    $code = strtoupper($values['prefix']) . strtoupper(str_replace('https://adventurelab.page.link/', '', $cache['FirebaseDynamicLink'])) . ($codeCnt ? $codeCnt : '') . str_pad((string) $stage, 2, '0', STR_PAD_LEFT);
-                    $codeCnt++;
-                }
-                $usedCodes[] = $code;
-
-                $xml .= '<wpt lat="' . $lat . '" lon="' . $lon . '">
-                    <time>' . $cache['PublishedUtc'] . '</time>
-                    <name>' . $code . '</name>
-                    <desc>' . gpxEncode($wpt['Title']) . '</desc>
-                    <url>' . $cache['DeepLink'] . '</url>
-                    <urlname>S' . $displayStage . ' ' . gpxEncode($cache['Title']) . '</urlname>
-                    <sym>Geocache' . ($found ? ' Found' : '') . '</sym>
-                    <type>Geocache|' . $values['cacheType'] . '</type>';
-                if ($values['linear'] === 'corrected' && $cache['IsLinear']) {
-                    $xml .= '<gsak:wptExtension xmlns:gsak="http://www.gsak.net/xmlv1/5">
-                        <gsak:Code>' . $code . '</gsak:Code>
-                        <gsak:IsPremium>false</gsak:IsPremium>
-                        <gsak:FavPoints>0</gsak:FavPoints>
-                        <gsak:UserFlag>false</gsak:UserFlag>
-                        <gsak:DNF>false</gsak:DNF>
-                        <gsak:FTF>false</gsak:FTF>
-                        <gsak:LatBeforeCorrect>' . $lat . '</gsak:LatBeforeCorrect>
-                        <gsak:LonBeforeCorrect>' . $lon . '</gsak:LonBeforeCorrect>
-                    </gsak:wptExtension>';
-                }
-                $xml .= '<groundspeak:cache id="' . $id . '" available="True" archived="False" xmlns:groundspeak="http://www.groundspeak.com/cache/1/0/1">
-                        <groundspeak:name>' . gpxEncode($waypointTitle) . '</groundspeak:name>
-                        <groundspeak:placed_by>' . gpxEncode($cache['OwnerUsername']) . '</groundspeak:placed_by>
-                        <groundspeak:owner>' . gpxEncode($cache['OwnerUsername']) . '</groundspeak:owner>
-                        <groundspeak:type>' . $values['cacheType'] . '</groundspeak:type>
-                        <groundspeak:container>Virtual</groundspeak:container>
-                        <groundspeak:attributes />
-                        <groundspeak:difficulty>1</groundspeak:difficulty>
-                        <groundspeak:terrain>1</groundspeak:terrain>
-                        <groundspeak:country />
-                        <groundspeak:state />
-                        <groundspeak:short_description html="True" />
-                        <groundspeak:long_description html="True">' . gpxEncode($description) . '</groundspeak:long_description>
-                        <groundspeak:encoded_hints />
-                        <groundspeak:logs />
-                        <groundspeak:travelbugs />
-                    </groundspeak:cache>
-                </wpt>';
-
-                $coordinate = new Coordinate($lat, $lon);
-                $formatter = new \App\DecimalMinutes();
-                $cacheturDotNo .= $code . ';lab;' . $coordinate->format($formatter) . ';' . $waypointTitle . "\n";
-
-                $stage++;
-                $id--;
-
-                if ($cache['IsLinear'] && $values['linear'] === 'first') {
-                    break;
-                }
-            }
-        }
-
-        $xml .= '</gpx>';
-
-        if ($values['outputFormat'] === 'zippedgpx') {
-            $zip = new ZipArchive;
-            $tmpFile = tempnam($tmpDir, 'lab2gpx');
-            if (! $zip->open($tmpFile, ZipArchive::CREATE)) {
-                echo $LANG['ERROR_ZIP_FAILED'];
+                $xml = $exporter->export($fetchedLabs, $values, $ownersToSkip, $finds);
+                $zip->addFromString('labs2gpx.gpx', $xml);
+                $zip->close();
+                header("Content-type: application/zip");
+                header("Content-Disposition: attachment; filename=labs2gpx.zip");
+                header("Content-length: " . filesize($tmpFile));
+                header("Pragma: no-cache");
+                header("Expires: 0");
+                readfile($tmpFile);
                 exit;
-            }
-            $zip->addFromString('labs2gpx.gpx', $xml);
-            $zip->close();
-            header("Content-type: application/zip");
-            header("Content-Disposition: attachment; filename=labs2gpx.zip");
-            header("Content-length: " . filesize($tmpFile));
-            header("Pragma: no-cache");
-            header("Expires: 0");
-            readfile($tmpFile);
-            exit;
-        }
-        if ($values['outputFormat'] === 'gpx') {
-            header("Content-type: application/gpx+xml");
-            header("Content-Disposition: attachment; filename=labs2gpx.gpx");
-            header("Content-length: " . strlen($xml));
-            header("Pragma: no-cache");
-            header("Expires: 0");
-            echo $xml;
-            exit;
-        }
-        if ($values['outputFormat'] === 'cacheturdotno') {
-            header("Content-type: text/csv");
-            header("Content-Disposition: attachment; filename=labs2gpx.csv");
-            header("Content-length: " . strlen($cacheturDotNo));
-            header("Pragma: no-cache");
-            header("Expires: 0");
-            echo $cacheturDotNo;
-            exit;
+            case 'gpx':
+                $exporter = new GpxExporter($dataDir, $LANG);
+                $xml = $exporter->export($fetchedLabs, $values, $ownersToSkip, $finds);
+                header("Content-type: application/gpx+xml");
+                header("Content-Disposition: attachment; filename=labs2gpx.gpx");
+                header("Content-length: " . strlen($xml));
+                header("Pragma: no-cache");
+                header("Expires: 0");
+                echo $xml;
+                exit;
+            case 'cacheturdotno':
+                $exporter = new CacheturDotNoExporter($dataDir, $LANG);
+                $cacheturDotNo = $exporter->export($fetchedLabs, $values, $ownersToSkip, $finds);
+                header("Content-type: text/csv");
+                header("Content-Disposition: attachment; filename=labs2gpx.csv");
+                header("Content-length: " . strlen($cacheturDotNo));
+                header("Pragma: no-cache");
+                header("Expires: 0");
+                echo $cacheturDotNo;
+                exit;
+            default:
+                throw new RuntimeException('Unknown output format.');
         }
     }
 }
