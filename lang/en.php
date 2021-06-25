@@ -60,6 +60,7 @@ $LANG['LABEL_INCLUDE_FINDS'] = 'Do not exclude my finds but mark as found';
 $LANG['META_DESCRIPTION'] = 'Generates GPX files (PQ) for Geocaching Adventure Labs';
 $LANG['INVALID_PREFIX'] = 'The prefix must be 2-3 characters long';
 $LANG['LABEL_PREFIX'] = 'Code prefix';
+$LANG['LABEL_CODE_IS_CASE_SENSITIVE'] = 'Do not convert Code to upper case (<a href="https://github.com/mirsch/lab2gpx/issues/30" target="_blank">#30</a>)';
 $LANG['LABEL_LINEAR'] = 'Linear Adventure Labs';
 $LANG['LINEAR_TYPE_DEFAULT'] = 'Default';
 $LANG['LINEAR_TYPE_FIRST'] = 'Include only first/next station';

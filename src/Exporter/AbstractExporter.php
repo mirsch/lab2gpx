@@ -73,8 +73,12 @@ abstract class AbstractExporter
         $code = '';
         $codeCnt = 0;
         // the firebase link contains upper and lower case letters so there may be collisions if we convert it to upper case
+        $fixedPart = str_replace('https://adventurelab.page.link/', '', $cache['FirebaseDynamicLink']);
+        if (! $values['codeIsCaseSensitive']) {
+            $fixedPart = strtoupper($fixedPart);
+        }
         while (! $code || (in_array($code, $this->usedCodes) && $codeCnt < 16)) {
-            $code = strtoupper($values['prefix']) . strtoupper(str_replace('https://adventurelab.page.link/', '', $cache['FirebaseDynamicLink'])) . ($codeCnt ? $codeCnt : '') . str_pad((string) $stage, 2, '0', STR_PAD_LEFT);
+            $code = strtoupper($values['prefix']) . $fixedPart . ($codeCnt ? $codeCnt : '') . str_pad((string) $stage, 2, '0', STR_PAD_LEFT);
             $codeCnt++;
         }
         $this->usedCodes[] = $code;
