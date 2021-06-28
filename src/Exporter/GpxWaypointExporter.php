@@ -106,19 +106,21 @@ class GpxWaypointExporter extends GpxExporter
                     <urlname>' . $this->gpxEncode($cache['Title']) . '</urlname>
                     <sym>Geocache' . ($found ? ' Found' : '') . '</sym>
                     <type>Geocache|' . $values['cacheType'] . '</type>';
-            if ($values['linear'] === 'corrected' && $cache['IsLinear']) {
-                $xml .= '<gsak:wptExtension xmlns:gsak="http://www.gsak.net/xmlv1/5">
+            $xml .= '<gsak:wptExtension xmlns:gsak="http://www.gsak.net/xmlv1/5">
                         <gsak:Code>' . $code . '</gsak:Code>
                         <gsak:IsPremium>false</gsak:IsPremium>
                         <gsak:FavPoints>0</gsak:FavPoints>
                         <gsak:UserFlag>false</gsak:UserFlag>
                         <gsak:UserData>' . $cache['Id'] . '</gsak:UserData>
                         <gsak:DNF>false</gsak:DNF>
-                        <gsak:FTF>false</gsak:FTF>
+                        <gsak:FTF>false</gsak:FTF>';
+            if ($values['linear'] === 'corrected' && $cache['IsLinear']) {
+                $xml .= '
                         <gsak:LatBeforeCorrect>' . $lat . '</gsak:LatBeforeCorrect>
-                        <gsak:LonBeforeCorrect>' . $lon . '</gsak:LonBeforeCorrect>
-                    </gsak:wptExtension>';
+                        <gsak:LonBeforeCorrect>' . $lon . '</gsak:LonBeforeCorrect>';
             }
+            $xml .= '
+                    </gsak:wptExtension>';
             $xml .= '<groundspeak:cache id="' . $id . '" available="True" archived="False" xmlns:groundspeak="http://www.groundspeak.com/cache/1/0/1">
                         <groundspeak:name>' . $this->gpxEncode($cache['Title']) . '</groundspeak:name>
                         <groundspeak:placed_by>' . $this->gpxEncode($cache['OwnerUsername']) . '</groundspeak:placed_by>
