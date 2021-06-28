@@ -105,6 +105,7 @@ class GpxExporter extends AbstractExporter
                         <gsak:IsPremium>false</gsak:IsPremium>
                         <gsak:FavPoints>0</gsak:FavPoints>
                         <gsak:UserFlag>false</gsak:UserFlag>
+                        <gsak:UserData>' . $wpt['Id'] . '</gsak:UserData>
                         <gsak:DNF>false</gsak:DNF>
                         <gsak:FTF>false</gsak:FTF>
                         <gsak:LatBeforeCorrect>' . $lat . '</gsak:LatBeforeCorrect>

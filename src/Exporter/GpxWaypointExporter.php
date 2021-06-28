@@ -64,6 +64,16 @@ class GpxWaypointExporter extends GpxExporter
         return $this->cleanupWaypointDescription($description);
     }
 
+    protected function getWaypointTitle(array $cache, array $values, array $wpt, int $stage): string
+    {
+        $waypointTitle = 'S' . $this->getStageForDisplay($stage, $cache) . ' ' . $wpt['Title'];
+        if ($cache['IsLinear'] && $values['linear'] === 'mark') {
+            $waypointTitle = '[L] ' . $waypointTitle;
+        }
+
+        return $waypointTitle;
+    }
+
     public function export(array $fetchedLabs, array $values, array $ownersToSkip, array $finds): string
     {
         $xml = '<?xml version="1.0" encoding="utf-8"?>
@@ -102,6 +112,7 @@ class GpxWaypointExporter extends GpxExporter
                         <gsak:IsPremium>false</gsak:IsPremium>
                         <gsak:FavPoints>0</gsak:FavPoints>
                         <gsak:UserFlag>false</gsak:UserFlag>
+                        <gsak:UserData>' . $cache['Id'] . '</gsak:UserData>
                         <gsak:DNF>false</gsak:DNF>
                         <gsak:FTF>false</gsak:FTF>
                         <gsak:LatBeforeCorrect>' . $lat . '</gsak:LatBeforeCorrect>

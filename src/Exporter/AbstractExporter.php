@@ -74,7 +74,11 @@ abstract class AbstractExporter
         $stage = $stage ? str_pad((string) $stage, 2, '0', STR_PAD_LEFT) : 0;
         $prefix = $values['prefix'];
         if ($useStageAsPrefix) {
-            $prefix = $stage;
+            $stage = strtoupper(dechex((int) $stage));
+            $prefix = 'S' . $stage;
+            if ($cache['IsLinear']) {
+                $prefix = 'L' . $stage;
+            }
             $stage = 0;
         }
         $codeCnt = 0;
