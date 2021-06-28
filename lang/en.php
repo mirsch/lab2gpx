@@ -31,7 +31,10 @@ $LANG['ERROR_ZIP_FAILED'] = 'Sorry, some thing went wrong. File not created.';
 $LANG['INTRO'] = '
     <p>This tool generates a GPX file containing Geocaching Adventure Labs for use in several Geocaching Apps and Garmin GPS devices.</p>
     <p>The Website stores your settings (except your finds) in a cookie. So don\'t delete this cookie if you want to keep your settings for the next time you use this site.</p>
-    <p>If you find bugs or have feature requests, feel free to <a href="https://github.com/mirsch/lab2gpx/issues" target="_blank">open an issue</a>.</p>';
+    <p>If you find bugs or have feature requests, feel free to <a href="https://github.com/mirsch/lab2gpx/issues" target="_blank">open an issue</a>.</p>
+    <p>For other inquiries you can use the following email address: lab2gpx@gcutils.de 
+    (Questions about usage, error reports or feature requests will not be answered by email)</p>
+    ';
 $LANG['LEGEND_GENERAL'] = 'General';
 $LANG['LEGEND_DESCRIPTION'] = 'Description';
 $LANG['LEGEND_EXCLUDE'] = 'Exclude';

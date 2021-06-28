@@ -9,6 +9,12 @@ class GpxExporter extends AbstractExporter
         return htmlentities($s, ENT_XML1);
     }
 
+    protected function cleanupWaypointDescription(string $description): string
+    {
+        // remove non printable chars https://github.com/mirsch/lab2gpx/issues/10
+        return preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $description);
+    }
+
     protected function getWaypointDescription(array $cache, array $values, array $wpt): string
     {
         $description = '<h3>' . $cache['Title'] . '</h3>';
@@ -51,10 +57,7 @@ class GpxExporter extends AbstractExporter
             }
         }
 
-        // remove non printable chars https://github.com/mirsch/lab2gpx/issues/10
-        $description = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $description);
-
-        return $description;
+        return $this->cleanupWaypointDescription($description);
     }
 
     public function export(array $fetchedLabs, array $values, array $ownersToSkip, array $finds): string

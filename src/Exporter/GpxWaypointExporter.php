@@ -15,11 +15,61 @@ class GpxWaypointExporter extends GpxExporter
         return true;
     }
 
+    protected function getCacheDescription(array $cache, array $values): string
+    {
+        $description = '<h3>' . $cache['Title'] . '</h3>';
+        if ($cache['IsLinear']) {
+            $description .= '<p><span style="background:#990000;color:#fff;border-radius:5px;padding:3px 5px;">' . $this->locale['TAG_LINEAR'] . '</span></p>';
+        }
+        $description .= '<p><a href="' . $cache['DeepLink'] . '">' . $cache['DeepLink'] . '</a></p>';
+
+        if ($values['includeCacheDescription']) {
+            $description .= '<hr />';
+            $description .= '<h5>' . $this->locale['HEADER_LAB_DESCRIPTION'] . '</h5>';
+            $description .= '<p><img src="' . $cache['KeyImageUrl'] . '" /></p>';
+            $description .= '<p>' . $cache['Description'] . '</p>';
+        }
+
+        $stage = 1;
+        foreach ($cache['GeocacheSummaries'] as $wpt) {
+            $description .= '<hr />';
+            $description .= '<h4>' . $this->getWaypointTitle($cache, $values, $wpt, $stage) . '</h4';
+
+            if ($values['includeQuestion']) {
+                $description .= '<p>' . $this->locale['HEADER_QUESTION'] . ':<br />' . $wpt['Question'] . '</p>';
+            }
+
+            if ($values['includeWaypointDescription']) {
+                $description .= '<hr />';
+                $description .= '<h5>' . $this->locale['HEADER_WAYPOINT_DESCRIPTION'] . '</h5>';
+                $description .= '<p><img src="' . $wpt['KeyImageUrl'] . '" /></p>';
+                $description .= '<p>' . $wpt['Description'] . '</p>';
+            }
+
+            if ($values['includeAwardMessage']) {
+                if ($wpt['AwardImageUrl'] || $wpt['CompletionAwardMessage']) {
+                    $description .= '<hr />';
+                    $description .= '<h5>' . $this->locale['HEADER_AWARD'] . '</h5>';
+                }
+                if ($wpt['AwardImageUrl']) {
+                    $description .= '<p><img src="' . $wpt['AwardImageUrl'] . '" /></p>';
+                }
+                if ($wpt['CompletionAwardMessage']) {
+                    $description .= '<p>' . $this->locale['HEADER_AWARD_MESSAGE'] . ':<br />' . $wpt['CompletionAwardMessage'] . '</p>';
+                }
+            }
+            $stage++;
+        }
+
+        return $this->cleanupWaypointDescription($description);
+    }
+
     public function export(array $fetchedLabs, array $values, array $ownersToSkip, array $finds): string
     {
         $xml = '<?xml version="1.0" encoding="utf-8"?>
                 <gpx xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" creator="Groundspeak Pocket Query" xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd http://www.groundspeak.com/cache/1/0/1 http://www.groundspeak.com/cache/1/0/1/cache.xsd" xmlns="http://www.topografix.com/GPX/1/0">
                     <name>Adventure Labs</name>
+                    <desc>(HasChildren)</desc>
                 ';
         $id = -1;
         foreach ($fetchedLabs as $cache) {
@@ -70,7 +120,7 @@ class GpxWaypointExporter extends GpxExporter
                         <groundspeak:country />
                         <groundspeak:state />
                         <groundspeak:short_description html="True" />
-                        <groundspeak:long_description html="True">' . $this->gpxEncode($this->getWaypointDescription($cache, $values, [])) . '</groundspeak:long_description>
+                        <groundspeak:long_description html="True">' . $this->gpxEncode($this->getCacheDescription($cache, $values)) . '</groundspeak:long_description>
                         <groundspeak:encoded_hints />
                         <groundspeak:logs />
                         <groundspeak:travelbugs />
@@ -83,15 +133,12 @@ class GpxWaypointExporter extends GpxExporter
                 $lon = $wpt['Location']['Longitude'];
 
                 $wptCode = $this->getCode($cache, $values, $stage, true);
-                $tmpValues = $values;
-                $tmpValues['includeCacheDescription'] = false;
-                $description = $this->getWaypointDescription($cache, $tmpValues, $wpt);
                 $waypointTitle = $this->getStageForDisplay($stage, $cache) . ' ' . $wpt['Title'];
 
                 $xml .= '<wpt lat="' . $lat . '" lon="' . $lon . '">
                             <time>' . $cache['PublishedUtc'] . '</time>
                             <name>' . $wptCode . '</name>
-                            <cmt>' . $this->gpxEncode($description) . '</cmt>
+                            <cmt>' . $this->gpxEncode( $wpt['Question']) . '</cmt>
                             <url>' . $cache['DeepLink'] . '</url>
                             <desc>' . $this->gpxEncode($waypointTitle) . '</desc>
                             <sym>Virtual Stage</sym>
