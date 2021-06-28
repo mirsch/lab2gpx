@@ -33,7 +33,7 @@ class GpxWaypointExporter extends GpxExporter
         $stage = 1;
         foreach ($cache['GeocacheSummaries'] as $wpt) {
             $description .= '<hr />';
-            $description .= '<h4>' . $this->getWaypointTitle($cache, $values, $wpt, $stage) . '</h4';
+            $description .= '<h4>' . $this->getWaypointTitle($cache, $values, $wpt, $stage) . '</h4>';
 
             if ($values['includeQuestion']) {
                 $description .= '<p>' . $this->locale['HEADER_QUESTION'] . ':<br />' . $wpt['Question'] . '</p>';
