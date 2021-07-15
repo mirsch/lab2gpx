@@ -4,8 +4,12 @@ namespace App\Exporter;
 
 class GpxExporter extends AbstractExporter
 {
-    protected function gpxEncode(string $s): string
+    protected function gpxEncode(?string $s): string
     {
+        if (! $s) {
+            return '';
+        }
+
         return htmlentities($s, ENT_XML1);
     }
 
