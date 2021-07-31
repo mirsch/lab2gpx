@@ -111,7 +111,7 @@ class GpxWaypointExporter extends GpxExporter
                         <gsak:IsPremium>false</gsak:IsPremium>
                         <gsak:FavPoints>0</gsak:FavPoints>
                         <gsak:UserFlag>false</gsak:UserFlag>
-                        <gsak:UserData>' . $cache['Id'] . '</gsak:UserData>
+                        <gsak:Guid>' . $cache['Id'] . '</gsak:Guid>
                         <gsak:DNF>false</gsak:DNF>
                         <gsak:FTF>false</gsak:FTF>';
             if ($values['linear'] === 'corrected' && $cache['IsLinear']) {
