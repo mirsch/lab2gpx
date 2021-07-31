@@ -39,6 +39,10 @@ abstract class AbstractExporter
             return false;
         }
 
+        if (in_array($cache['Id'], $values['uuidsToExclude'])) {
+            return false;
+        }
+
         return true;
     }
 

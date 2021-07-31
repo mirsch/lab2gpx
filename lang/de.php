@@ -60,6 +60,7 @@ $LANG['NO_CACHES_FOUND'] = '<p>Ooops, an den Koordinaten wurden keine Caches gef
 $LANG['CURRENT_POSITION'] = 'meine aktuelle Position';
 $LANG['BROWSER_NO_LOCATION'] = 'Geolocation wird von Deinem Browser nicht unterstützt.';
 $LANG['LABEL_INCLUDE_FINDS'] = 'Funde nicht ausschließen sondern als gefunden markieren';
+$LANG['LABEL_UUIDS_TO_EXCLUDE'] = 'UUIDs ausschließen (<a href="https://github.com/mirsch/lab2gpx/issues/44" target="_blank">#44</a>)';
 $LANG['META_DESCRIPTION'] = 'Generiert GPX Dateien (PQ) für Geocaching Adventure Labs';
 $LANG['INVALID_PREFIX'] = 'Der Präfix muss 2-3 Zeichen lang sein';
 $LANG['LABEL_PREFIX'] = 'Code Präfix';

@@ -79,6 +79,11 @@ class GpxExporter extends AbstractExporter
 
             $stage = 1;
             foreach ($cache['GeocacheSummaries'] as $wpt) {
+                if (in_array($wpt['Id'], $values['uuidsToExclude'])) {
+                    $stage++;
+                    continue;
+                }
+
                 $found = $this->isFound($finds, $cache, $wpt);
                 if ($found && ! $values['includeFinds']) {
                     $stage++;

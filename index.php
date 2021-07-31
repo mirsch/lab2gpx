@@ -167,6 +167,7 @@ $values = [
     'excludeOwner' => '',
     'findsHtml' => '',
     'includeFinds' => false,
+    'uuidsToExclude' => [],
 
     'outputFormat' => 'zippedgpx',
 ];
@@ -226,6 +227,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (! array_key_exists($values['outputFormat'], $outputFormats)) {
         $values['linear'] = 'zippedgpx';
     }
+
+    $values['uuidsToExclude'] = str_replace(',', "\n", $values['uuidsToExclude']);
+    $values['uuidsToExclude'] = str_replace(';', "\n", $values['uuidsToExclude']);
+    $values['uuidsToExclude'] = str_replace("\r", "\n", $values['uuidsToExclude']);
+    $values['uuidsToExclude'] = array_map('trim', array_filter(explode("\n", $values['uuidsToExclude'])));
 
     if (! $errors) {
         $cookieValues = $values;
@@ -504,6 +510,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="checkbox" name="includeFinds"<?php echo($values['includeFinds'] ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_INCLUDE_FINDS']; ?>
                 </label>
             </div>
+
+            <div class="form-row">
+                <label for="uuidsToExclude"><?php echo $LANG['LABEL_UUIDS_TO_EXCLUDE']; ?>:</label>
+                <textarea id="uuidsToExclude" name="uuidsToExclude" rows="10"><?php echo htmlspecialchars(implode("\n", $values['uuidsToExclude'])); ?></textarea>
+            </div>
+
         </fieldset>
 
         <fieldset>

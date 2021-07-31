@@ -142,6 +142,11 @@ class GpxWaypointExporter extends GpxExporter
 
             $stage = 1;
             foreach ($cache['GeocacheSummaries'] as $wpt) {
+                if (in_array($wpt['Id'], $values['uuidsToExclude'])) {
+                    $stage++;
+                    continue;
+                }
+
                 $lat = $wpt['Location']['Latitude'];
                 $lon = $wpt['Location']['Longitude'];
 
