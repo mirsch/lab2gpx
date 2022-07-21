@@ -3,10 +3,11 @@
         "psr-4": {"App\\": "src/"}
     },
     "require": {
-        "mjaschen/phpgeo": "^3.2",
+        "php": ">=7.4",
         "ext-curl": "*",
         "ext-json": "*",
+        "ext-mbstring": "*",
         "ext-zip": "*",
-        "ext-mbstring": "*"
+        "mjaschen/phpgeo": "^3.2"
     }
 }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b52e38b8f5c6c1ebb8830dad596ffda2",
+    "content-hash": "34c59412a399610a91adab2455becfa2",
     "packages": [
         {
             "name": "mjaschen/phpgeo",
@@ -71,6 +71,12 @@
                 "track",
                 "vincenty"
             ],
+            "support": {
+                "docs": "https://phpgeo.marcusjaschen.de/Installation.html",
+                "email": "mjaschen@gmail.com",
+                "issues": "https://github.com/mjaschen/phpgeo/issues",
+                "source": "https://github.com/mjaschen/phpgeo/tree/3.2.1"
+            },
             "time": "2021-03-04T10:03:03+00:00"
         }
     ],
@@ -81,11 +87,12 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
+        "php": ">=7.4",
         "ext-curl": "*",
         "ext-json": "*",
-        "ext-zip": "*",
-        "ext-mbstring": "*"
+        "ext-mbstring": "*",
+        "ext-zip": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "1.1.0"
+    "plugin-api-version": "2.3.0"
 }
