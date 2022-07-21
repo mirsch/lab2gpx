@@ -38,7 +38,7 @@ require_once __DIR__ . '/config.local.php';
 $dataDir = __DIR__ . '/data';
 $logFile = __DIR__ . '/lab2gpx.log';
 $tmpDir = sys_get_temp_dir();
-define('CACHE_LIFE_TIME_IN_SECONDS', 24 * 60 * 60);
+const CACHE_LIFE_TIME_IN_SECONDS = 24 * 60 * 60;
 
 function fetch(string $url): string
 {
@@ -190,6 +190,8 @@ if (isset($_COOKIE[$cookieName])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $values = array_merge($values, $_POST);
 
+    $values['includeAwardMessage'] = false;
+
     try {
         $coordinates = CoordinateFactory::fromString($values['coordinates']);
     } catch (Throwable $throwable) {
@@ -232,6 +234,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $values['uuidsToExclude'] = str_replace(';', "\n", $values['uuidsToExclude']);
     $values['uuidsToExclude'] = str_replace("\r", "\n", $values['uuidsToExclude']);
     $values['uuidsToExclude'] = array_map('trim', array_filter(explode("\n", $values['uuidsToExclude'])));
+
+    if (function_exists('debug_values')) {
+        debug_values($values);
+    }
 
     if (! $errors) {
         $cookieValues = $values;
@@ -483,12 +489,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="checkbox" name="includeCacheDescription"<?php echo($values['includeCacheDescription'] ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_INCLUDE_CACHE_DESCRIPTION']; ?>
                 </label>
             </div>
+            <!--
             <div class="form-row">
                 <label>
                     <input type="hidden" name="includeAwardMessage" value="0">
                     <input type="checkbox" name="includeAwardMessage"<?php echo($values['includeAwardMessage'] ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_INCLUDE_AWARD']; ?>
                 </label>
             </div>
+            -->
         </fieldset>
 
         <fieldset>
