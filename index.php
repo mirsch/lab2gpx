@@ -286,6 +286,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $tmpFile = tempnam($tmpDir, 'lab2gpx');
                 if (! $zip->open($tmpFile, ZipArchive::CREATE)) {
                     echo $LANG['ERROR_ZIP_FAILED'];
+                    @unlink($tmpFile);
                     exit;
                 }
                 $xml = $exporter->export($fetchedLabs, $values, $ownersToSkip, $finds);
@@ -297,6 +298,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 header("Pragma: no-cache");
                 header("Expires: 0");
                 readfile($tmpFile);
+                @unlink($tmpFile);
                 exit;
             case 'gpx':
             case 'gpxwpt':
