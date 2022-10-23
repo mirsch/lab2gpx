@@ -95,6 +95,12 @@ class GpxExporter extends AbstractExporter
 
                 $description = $this->getWaypointDescription($cache, $values, $wpt);
 
+                if ($values['questionAsHint'] && isset($wpt['Question'])) {
+                    $hints = '>' . $this->gpxEncode($wpt['Question']) . '</groundspeak:encoded_hints>';
+                } else {
+                    $hints = ' />';
+                }
+
                 $displayStage = $this->getStageForDisplay($stage, $cache);
 
                 $waypointTitle = $this->getWaypointTitle($cache, $values, $wpt, $stage);
@@ -136,7 +142,7 @@ class GpxExporter extends AbstractExporter
                         <groundspeak:state />
                         <groundspeak:short_description html="True" />
                         <groundspeak:long_description html="True">' . $this->gpxEncode($description) . '</groundspeak:long_description>
-                        <groundspeak:encoded_hints />
+                        <groundspeak:encoded_hints'. $hints . '
                         <groundspeak:logs />
                         <groundspeak:travelbugs />
                     </groundspeak:cache>
