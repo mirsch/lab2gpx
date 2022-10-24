@@ -163,6 +163,7 @@ $values = [
     'includeWaypointDescription' => true,
     'includeCacheDescription' => true,
     'includeAwardMessage' => false,
+    'questionAsHint' => false,
 
     'excludeOwner' => '',
     'findsHtml' => '',
@@ -477,6 +478,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label>
                     <input type="hidden" name="includeQuestion" value="0">
                     <input type="checkbox" name="includeQuestion"<?php echo($values['includeQuestion'] ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_INCLUDE_QUESTION']; ?>
+                </label>
+            </div>
+            <div class="form-row">
+                <label>
+                    <input type="hidden" name="questionAsHint" value="0">
+                    <input type="checkbox" name="questionAsHint"<?php echo($values['questionAsHint'] ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_QUESTION_AS_HINT']; ?>
                 </label>
             </div>
             <div class="form-row">

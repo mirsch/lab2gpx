@@ -47,6 +47,7 @@ $LANG['LABEL_TAKE'] = 'Max Caches (1 to 500)';
 $LANG['LABEL_CACHE_TYPE'] = 'Cache Type';
 $LANG['LABEL_HINT_CACHE_TYPE'] = 'Garmin GPS devices do not support Adventure Labs. You probably want to export them as virtual caches.';
 $LANG['LABEL_INCLUDE_QUESTION'] = 'Include Waypoint question in Cache description';
+$LANG['LABEL_QUESTION_AS_HINT'] = 'Write Waypoint question into Hint';
 $LANG['LABEL_INCLUDE_DESCRIPTION'] = 'Include description of the Waypoint in Cache description';
 $LANG['LABEL_INCLUDE_CACHE_DESCRIPTION'] = 'Include the description of the Adventure Lab in the Cache description';
 $LANG['LABEL_INCLUDE_AWARD'] = 'Include Award Message in Cache description <i>(may contain spoilers)</i>';
