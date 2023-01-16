@@ -40,7 +40,7 @@ $logFile = __DIR__ . '/lab2gpx.log';
 $tmpDir = sys_get_temp_dir();
 const CACHE_LIFE_TIME_IN_SECONDS = 24 * 60 * 60;
 
-function fetch(string $url): string
+function fetch(string $url, array $postdata=NULL): string
 {
     global $config;
 
@@ -49,10 +49,19 @@ function fetch(string $url): string
     curl_setopt($ch, CURLOPT_USERAGENT, 'Adventures/1.3.4 (2408) (ios/14.6)');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+
+    $headers = [
         'Accept: application/json',
         'x-consumer-key: ' . $config['CONSUMER_KEY'],
-    ]);
+    ];
+
+    if(!is_null($postdata)) {
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postdata));
+        array_push($headers, 'Content-Type: application/json');
+    }
+
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
     $data = curl_exec($ch);
 
@@ -67,20 +76,34 @@ function fetch(string $url): string
 function fetchLabs(Coordinate $coordinates, array $values, array &$fetchedLabs, $skip = 0)
 {
     global $LANG, $dataDir;
+    $dataDir = implode("/", array_filter([$dataDir, $values['userGuid']]));
+    if (! is_dir($dataDir)) {
+        mkdir($dataDir, 0777, true);
+    }
 
     $max = $values['take'];
     $take = $max;
     if ($take > 500) {
         $take = 500;
     }
-    $url = 'https://labs-api.geocaching.com/Api/Adventures/SearchV3?origin.latitude=' . $coordinates->getLat() . '&origin.longitude=' . $coordinates->getLng() . '&radiusMeters=' . ($values['radius'] * 1000) . '&skip=' . $skip . '&take=' . $take;
-    $labCachesJson = fetch($url);
+
+    $postdata = [
+        'Origin' => ['Latitude' => $coordinates->getLat(), 'Longitude' => $coordinates->getLng()],
+        'RadiusInMeters' => $values['radius']*1000, 'skip' => $skip, 'take' => $take,
+
+        'CallingUserPublicGuid' => $values['userGuid'],
+        'CompletionStatuses' => array_values(array_filter($values['completionStatuses'], 'strlen'))
+    ];
+
+    $url = "https://labs-api.geocaching.com/Api/Adventures/SearchV4";
+
+    $labCachesJson = fetch($url, $postdata);
     $labCaches = json_decode($labCachesJson, true);
     if (! $labCaches || ! is_array($labCaches) || ! $labCaches['Items'] > 0) {
         echo $LANG['NO_CACHES_FOUND'];
         exit;
     }
-    $file = $dataDir . '/search_' . md5($url) . '.json';
+    $file = $dataDir . '/search_' . md5($url . json_encode($postdata)) . '.json';
     file_put_contents($file, json_encode($labCaches, JSON_PRETTY_PRINT));
 
     foreach ($labCaches['Items'] as $cache) {
@@ -93,7 +116,7 @@ function fetchLabs(Coordinate $coordinates, array $values, array &$fetchedLabs, 
             continue;
         }
         @set_time_limit(10);
-        $url = 'https://labs-api.geocaching.com/Api/Adventures/' . $cache['Id'];
+        $url = 'https://labs-api.geocaching.com/Api/Adventures/' . $cache['Id'] . '?callerGuid=' . $values['userGuid'];
         $details = fetch($url);
         file_put_contents($file, json_encode(json_decode($details, true), JSON_PRETTY_PRINT));
         $fetchedLabs[] = $cache;
@@ -166,6 +189,8 @@ $values = [
 
     'excludeOwner' => '',
     'findsHtml' => '',
+    'userGuid' => '',
+    'completionStatuses' => [NULL, 1, 2],
     'includeFinds' => false,
     'uuidsToExclude' => [],
 
@@ -220,6 +245,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (strlen($values['prefix']) > 3 || strlen($values['prefix']) < 2) {
         $errors['prefix'] = $LANG['INVALID_PREFIX'];
+    }
+
+    if(preg_match('/[^a-fA-F0-9-]+/', $values['userGuid'])) {
+        $errors['guid'] = $LANG['INVALID_GUID'];
     }
 
     if (! array_key_exists($values['linear'], $linearTypes)) {
@@ -513,6 +542,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <textarea id="findsHtml" name="findsHtml" rows="10"><?php echo htmlspecialchars($values['findsHtml']); ?></textarea>
                 <p><?php echo $LANG['LABEL_HINT_EXCLUDE_FINDS']; ?></p>
             </div>
+
+            <div class="form-row<?php echo(isset($errors['guid']) ? ' error' : ''); ?>">
+                <label for="userGuid"><?php echo $LANG['LABEL_USERGUID']; ?>:</label>
+                <input type="text" id="userGuid" name="userGuid" value="<?php echo htmlspecialchars((string) $values['userGuid']); ?>"/>
+                <?php if (isset($errors['guid'])) {
+                    echo '<p class="error">' . $errors['guid'] . '</p>';
+                } ?>
+                <p><?php echo $LANG['LABEL_HINT_USER_GUID']; ?></p>
+            </div>
+
+            <div class="form-row">
+                <label>
+                    <input type="hidden" name="completionStatuses[0]">
+                    <input type="checkbox" name="completionStatuses[0]" value="0"<?php echo($values['completionStatuses'][0] ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_INCLUDE_FOUND']; ?>
+                </label>
+                <label>
+                    <input type="hidden" name="completionStatuses[1]">
+                    <input type="checkbox" name="completionStatuses[1]" value="1"<?php echo($values['completionStatuses'][1] ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_INCLUDE_PARTIAL']; ?>
+                </label>
+                <label>
+                    <input type="hidden" name="completionStatuses[2]">
+                    <input type="checkbox" name="completionStatuses[2]" value="2"<?php echo($values['completionStatuses'][2] ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_INCLUDE_UNFOUND']; ?>
+                </label>
+            </div>
+
 
             <div class="form-row">
                 <label>
