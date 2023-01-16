@@ -48,6 +48,9 @@ abstract class AbstractExporter
 
     protected function isFound(array $finds, array $cache, array $wpt): bool
     {
+	if ($wpt['IsComplete'])
+	    return true;
+
         if (isset($finds[$cache['Id']])) {
             if (in_array(trim($wpt['Title']), $finds[$cache['Id']])) {
                 return true;
