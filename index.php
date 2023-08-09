@@ -240,6 +240,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         debug_values($values);
     }
 
+    if (isset($_FILES['findsHtmlFile']) && $_FILES['findsHtmlFile']['error'] === UPLOAD_ERR_OK) {
+        $values['findsHtml'] = file_get_contents($_FILES['findsHtmlFile']['tmp_name']);
+
+        if(preg_match('/<a.*class="username".*title="(.*)">/msU', $values['findsHtml'], $matches) === 1) {
+            $values['username'] = $matches[1];
+            $file = $dataDir . '/' . $values['username'] . '.html';
+            move_uploaded_file($_FILES['findsHtmlFile']['tmp_name'], $file);
+        }
+    } else if (array_key_exists('username',$values) && !empty($values['username']) && file_exists($file = $dataDir . '/' . $values['username'] . '.html') && filemtime($file) > time() - CACHE_LIFE_TIME_IN_SECONDS) {
+        $values['findsHtml'] = file_get_contents($file);
+    }
+
     if (! $errors) {
         $cookieValues = $values;
         unset($cookieValues['findsHtml']);
@@ -402,7 +414,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 <div class="page">
     <?php echo $LANG['INTRO']; ?>
-    <form method="post">
+    <form enctype="multipart/form-data" method="post">
         <fieldset>
             <legend><?php echo $LANG['LEGEND_GENERAL']; ?></legend>
             <div class="form-row<?php echo(isset($errors['coordinates']) ? ' error' : ''); ?>">
@@ -512,7 +524,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="form-row">
                 <label for="findsHtml"><?php echo $LANG['LABEL_EXCLUDE_FINDS']; ?>:</label>
-                <textarea id="findsHtml" name="findsHtml" rows="10"><?php echo htmlspecialchars($values['findsHtml']); ?></textarea>
+                <textarea id="findsHtml" name="findsHtml" rows="10"><?php echo htmlspecialchars($values['findsHtml']); ?></textarea><br />
+                <input type="file" name="findsHtmlFile" />
                 <p><?php echo $LANG['LABEL_HINT_EXCLUDE_FINDS']; ?></p>
             </div>
 
