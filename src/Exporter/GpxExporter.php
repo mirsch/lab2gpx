@@ -139,7 +139,14 @@ class GpxExporter extends AbstractExporter
                         <groundspeak:encoded_hints />
                         <groundspeak:logs />
                         <groundspeak:travelbugs />
-                    </groundspeak:cache>
+                    </groundspeak:cache>';
+                if ($values['linear'] === 'emoji' && $cache['IsLinear']) {
+                    $xml .= '
+                    <cgeo:cacheExtension>
+                      <cgeo:assignedEmoji>'.(49+$stage-1).'</cgeo:assignedEmoji>
+                    </cgeo:cacheExtension>';
+                }
+                $xml .= '
                 </wpt>';
 
                 $stage++;

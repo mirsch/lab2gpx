@@ -72,6 +72,7 @@ $LANG['LINEAR_TYPE_FIRST'] = 'Include only first/next station';
 $LANG['LINEAR_TYPE_MARK'] = 'Mark using [L] in title';
 $LANG['LINEAR_TYPE_CORRECTED'] = 'As corrected coordinates';
 $LANG['LINEAR_TYPE_IGNORE'] = 'Ignore';
+$LANG['LINEAR_TYPE_EMOJI'] = 'c:geo Emoji';
 $LANG['LABEL_OUTPUT_FORMAT'] = 'Output format';
 $LANG['OUTPUT_ZIPPED_GPX'] = 'Zipped GPX';
 $LANG['OUTPUT_GPX'] = 'GPX';
