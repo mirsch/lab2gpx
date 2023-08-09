@@ -142,6 +142,7 @@ $linearTypes = [
     'mark' => $LANG['LINEAR_TYPE_MARK'],
     'corrected' => $LANG['LINEAR_TYPE_CORRECTED'],
     'ignore' => $LANG['LINEAR_TYPE_IGNORE'],
+    'emoji' => $LANG['LINEAR_TYPE_EMOJI'],
 ];
 $outputFormats = [
     'zippedgpx' => $LANG['OUTPUT_ZIPPED_GPX'],
@@ -261,6 +262,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $ownersToSkip = array_unique($ownersToSkip);
 
         $finds = [];
+
         if ($values['findsHtml'] !== '') {
             preg_match_all('/<li data-adv-id="([0-9a-z-]*)" class="deletable"(.*)<span class="cache-title">(.*)<\/span>/msU', $values['findsHtml'], $matches);
             $finds = array_unique($matches[1]);
