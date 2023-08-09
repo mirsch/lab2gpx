@@ -21,6 +21,7 @@
 $LANG['INVALID_COORDINATES'] = 'Invalid coordinate format.';
 $LANG['INVALID_RADIUS_HIGH'] = 'Radius must not be greater than 20000 km.';
 $LANG['INVALID_RADIUS_LOW'] = 'Radius must not be lower than 1 km.';
+$LANG['INVALID_GUID'] = 'GUID must only contain letters a-f, numbers 0-9 and hyphen (-)';
 $LANG['TAG_LINEAR'] = 'linear';
 $LANG['HEADER_QUESTION'] = 'Question';
 $LANG['HEADER_WAYPOINT_DESCRIPTION'] = 'Waypoint Description';
@@ -52,6 +53,13 @@ $LANG['LABEL_INCLUDE_CACHE_DESCRIPTION'] = 'Include the description of the Adven
 $LANG['LABEL_INCLUDE_AWARD'] = 'Include Award Message in Cache description <i>(may contain spoilers)</i>';
 $LANG['LABEL_EXCLUDE_OWNER'] = 'Exclude Owner name (one per Line)';
 $LANG['LABEL_EXCLUDE_FINDS'] = 'Exclude your finds, copy & paste source code of your finds page';
+$LANG['LABEL_USERGUID'] = "Calling user's public GUID (required for the 3 options below to work)";
+$LANG['LABEL_HINT_USER_GUID'] = '
+    Go to <a href="https://www.geocaching.com/find/default.aspx" target="_blank">https://www.geocaching.com/find/default.aspx</a> and look up your own username to find this. 
+    The GUID is included at the end of the URL of the resulting page.';
+$LANG['LABEL_INCLUDE_FOUND'] = 'Include fully completed labs';
+$LANG['LABEL_INCLUDE_PARTIAL'] = 'Include partially completed labs';
+$LANG['LABEL_INCLUDE_UNFOUND'] = 'Include unstarted labs';
 $LANG['LABEL_HINT_EXCLUDE_FINDS'] = '
     Go to <a href="https://labs.geocaching.com/logs" target="_blank">https://labs.geocaching.com/logs</a>, log in so you can see your logs.
     Select "view source code" in your browser and copy & paste the entire source code into this field.';

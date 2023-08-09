@@ -52,6 +52,13 @@ $LANG['LABEL_INCLUDE_CACHE_DESCRIPTION'] = 'Beschreibung des Adventure Labs in C
 $LANG['LABEL_INCLUDE_AWARD'] = 'Tagebucheinträge in Cache Beschreibung einfügen <i>(kann Spoiler enthalten)</i>';
 $LANG['LABEL_EXCLUDE_OWNER'] = 'Owner Name ausschließen (ein Name pro Zeile)';
 $LANG['LABEL_EXCLUDE_FINDS'] = 'Deine Funde ausschließen, Source Code der Seite Deiner Funde kopieren & einfügen';
+$LANG['LABEL_USERGUID'] = "Öffentliche GUID des Benutzers (benötigt für die 3 Optionen unten)";
+$LANG['LABEL_HINT_USER_GUID'] = '
+    Gehe zu <a href="https://www.geocaching.com/find/default.aspx" target="_blank">https://www.geocaching.com/find/default.aspx</a> und suche nach deinem eigenen Benutzernamen um die GUID zu finden. 
+    Die GUID steht am Ende der URL der geöffneten Seite.';
+$LANG['LABEL_INCLUDE_FOUND'] = 'Komplett beendete Adventures einschließen';
+$LANG['LABEL_INCLUDE_PARTIAL'] = 'Teilweise beendete Adventures einschließen';
+$LANG['LABEL_INCLUDE_UNFOUND'] = 'Nicht begonnene Adventures einschließen';
 $LANG['LABEL_HINT_EXCLUDE_FINDS'] = '
     Gehe zu <a href="https://labs.geocaching.com/logs" target="_blank">https://labs.geocaching.com/logs</a> und logge Dich ein, so dass Du Deine Logs sehen kannst.
     Wähle in Deinem Browser "Quelltext anzeigen" und kopiere den gesamten Quelltext in dieses Feld.';
