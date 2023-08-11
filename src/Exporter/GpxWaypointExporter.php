@@ -156,7 +156,9 @@ class GpxWaypointExporter extends GpxExporter
                 $xml .= '<wpt lat="' . $lat . '" lon="' . $lon . '">
                             <time>' . $cache['PublishedUtc'] . '</time>
                             <name>' . $wptCode . '</name>
-                            <cmt>' . $this->gpxEncode( $wpt['Question']) . '</cmt>
+                            <cmt>' . ($values['includeGeofencing'] ? ' ○ ' . $wpt['GeofencingRadius'] . 'm
+
+			            ' : '') . $this->gpxEncode( $wpt['Question']) . '</cmt>
                             <url>' . $cache['DeepLink'] . '</url>
                             <desc>' . $this->gpxEncode($waypointTitle) . '</desc>
                             <sym>Virtual Stage</sym>

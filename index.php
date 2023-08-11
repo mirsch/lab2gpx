@@ -160,6 +160,7 @@ $values = [
     'linear' => 'default',
 
     'includeQuestion' => true,
+    'includeGeofencing' => false,
     'includeWaypointDescription' => true,
     'includeCacheDescription' => true,
     'includeAwardMessage' => false,
@@ -477,6 +478,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label>
                     <input type="hidden" name="includeQuestion" value="0">
                     <input type="checkbox" name="includeQuestion"<?php echo($values['includeQuestion'] ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_INCLUDE_QUESTION']; ?>
+                </label>
+            </div>
+            <div class="form-row">
+                <label>
+                    <input type="hidden" name="includeGeofencing" value="0">
+                    <input type="checkbox" name="includeGeofencing"<?php echo($values['includeGeofencing'] ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_INCLUDE_GEOFENCING']; ?>
                 </label>
             </div>
             <div class="form-row">
