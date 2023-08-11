@@ -16,7 +16,7 @@ abstract class AbstractExporter
         $this->locale = $locale;
     }
 
-    abstract public function export(array $fetchedLabs, array $values, array $ownersToSkip, array $finds): string;
+    abstract public function export(array $fetchedLabs, array $values, array $ownersToSkip): string;
 
     protected function getCache(string $id): array
     {
@@ -46,18 +46,9 @@ abstract class AbstractExporter
         return true;
     }
 
-    protected function isFound(array $finds, array $cache, array $wpt): bool
+    protected function isFound(array $wpt): bool
     {
-	if ($wpt['IsComplete'])
-	    return true;
-
-        if (isset($finds[$cache['Id']])) {
-            if (in_array(trim($wpt['Title']), $finds[$cache['Id']])) {
-                return true;
-            }
-        }
-
-        return false;
+        return $wpt['IsComplete'];
     }
 
     protected function getStageForDisplay(int $stage, array $cache): string

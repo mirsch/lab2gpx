@@ -52,7 +52,7 @@ function fetch(string $url, array $postdata=NULL): string
 
     $headers = [
         'Accept: application/json',
-        'x-consumer-key: ' . $config['CONSUMER_KEY'],
+        'X-Consumer-Key: ' . $config['CONSUMER_KEY'],
     ];
 
     if(!is_null($postdata)) {
@@ -269,18 +269,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         debug_values($values);
     }
 
-    if (isset($_FILES['findsHtmlFile']) && $_FILES['findsHtmlFile']['error'] === UPLOAD_ERR_OK) {
-        $values['findsHtml'] = file_get_contents($_FILES['findsHtmlFile']['tmp_name']);
-
-        if(preg_match('/<a.*class="username".*title="(.*)">/msU', $values['findsHtml'], $matches) === 1) {
-            $values['username'] = $matches[1];
-            $file = $dataDir . '/' . $values['username'] . '.html';
-            move_uploaded_file($_FILES['findsHtmlFile']['tmp_name'], $file);
-        }
-    } else if (array_key_exists('username',$values) && !empty($values['username']) && file_exists($file = $dataDir . '/' . $values['username'] . '.html') && filemtime($file) > time() - CACHE_LIFE_TIME_IN_SECONDS) {
-        $values['findsHtml'] = file_get_contents($file);
-    }
-
     if (! $errors) {
         $cookieValues = $values;
         unset($cookieValues['findsHtml']);
@@ -302,21 +290,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $ownersToSkip = array_map('trim', $ownersToSkip);
         $ownersToSkip = array_unique($ownersToSkip);
 
-        $finds = [];
-
-        if ($values['findsHtml'] !== '') {
-            preg_match_all('/<li data-adv-id="([0-9a-z-]*)" class="deletable"(.*)<span class="cache-title">(.*)<\/span>/msU', $values['findsHtml'], $matches);
-            $finds = array_unique($matches[1]);
-            foreach ($matches[1] as $idx => $cacheId) {
-                $foundTitle = html_entity_decode(trim($matches[3][$idx]));
-                // @see user notes at https://www.php.net/manual/de/function.html-entity-decode.php
-                $foundTitle = preg_replace_callback("/(&#[0-9]+;)/", function ($m) {
-                    return mb_convert_encoding($m[1], "UTF-8", "HTML-ENTITIES");
-                }, $foundTitle);
-                $finds[$cacheId][] = $foundTitle;
-            }
-        }
-
         switch ($values['outputFormat']) {
             case 'zippedgpx':
             case 'zippedgpxwpt':
@@ -332,7 +305,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     @unlink($tmpFile);
                     exit;
                 }
-                $xml = $exporter->export($fetchedLabs, $values, $ownersToSkip, $finds);
+                $xml = $exporter->export($fetchedLabs, $values, $ownersToSkip);
                 $zip->addFromString('labs2gpx.gpx', $xml);
                 $zip->close();
                 header("Content-type: application/zip");
@@ -350,7 +323,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } else {
                     $exporter = new GpxExporter($dataDir, $LANG);
                 }
-                $xml = $exporter->export($fetchedLabs, $values, $ownersToSkip, $finds);
+                $xml = $exporter->export($fetchedLabs, $values, $ownersToSkip);
                 header("Content-type: application/gpx+xml");
                 header("Content-Disposition: attachment; filename=labs2gpx.gpx");
                 header("Content-length: " . strlen($xml));
@@ -360,7 +333,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             case 'cacheturdotno':
                 $exporter = new CacheturDotNoExporter($dataDir, $LANG);
-                $cacheturDotNo = $exporter->export($fetchedLabs, $values, $ownersToSkip, $finds);
+                $cacheturDotNo = $exporter->export($fetchedLabs, $values, $ownersToSkip);
                 header("Content-type: text/csv");
                 header("Content-Disposition: attachment; filename=labs2gpx.csv");
                 header("Content-length: " . strlen($cacheturDotNo));
@@ -549,13 +522,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-row">
                 <label for="excludeOwner"><?php echo $LANG['LABEL_EXCLUDE_OWNER']; ?>:</label>
                 <textarea id="excludeOwner" name="excludeOwner" rows="3"><?php echo htmlspecialchars($values['excludeOwner']); ?></textarea>
-            </div>
-
-            <div class="form-row">
-                <label for="findsHtml"><?php echo $LANG['LABEL_EXCLUDE_FINDS']; ?>:</label>
-                <textarea id="findsHtml" name="findsHtml" rows="10"><?php echo htmlspecialchars($values['findsHtml']); ?></textarea><br />
-                <input type="file" name="findsHtmlFile" />
-                <p><?php echo $LANG['LABEL_HINT_EXCLUDE_FINDS']; ?></p>
             </div>
 
             <div class="form-row<?php echo(isset($errors['guid']) ? ' error' : ''); ?>">

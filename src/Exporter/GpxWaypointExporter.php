@@ -4,15 +4,9 @@ namespace App\Exporter;
 
 class GpxWaypointExporter extends GpxExporter
 {
-    protected function foundAll(array $finds, array $cache): bool
+    protected function foundAll(array $cache): bool
     {
-        foreach ($cache['GeocacheSummaries'] as $wpt) {
-            if (! $this->isFound($finds, $cache, $wpt)) {
-                return false;
-            }
-        }
-
-        return true;
+        return $cache['IsComplete'];
     }
 
     protected function getCacheDescription(array $cache, array $values): string
@@ -74,7 +68,7 @@ class GpxWaypointExporter extends GpxExporter
         return $waypointTitle;
     }
 
-    public function export(array $fetchedLabs, array $values, array $ownersToSkip, array $finds): string
+    public function export(array $fetchedLabs, array $values, array $ownersToSkip): string
     {
         $xml = '<?xml version="1.0" encoding="utf-8"?>
                 <gpx xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" creator="Groundspeak Pocket Query" xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd http://www.groundspeak.com/cache/1/0/1 http://www.groundspeak.com/cache/1/0/1/cache.xsd" xmlns="http://www.topografix.com/GPX/1/0">
@@ -88,7 +82,7 @@ class GpxWaypointExporter extends GpxExporter
                 continue;
             }
 
-            $found = $this->foundAll($finds, $cache);
+            $found = $this->foundAll($cache);
             if ($found && ! $values['includeFinds']) {
                 continue;
             }

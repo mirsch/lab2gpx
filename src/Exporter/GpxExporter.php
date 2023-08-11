@@ -64,10 +64,10 @@ class GpxExporter extends AbstractExporter
         return $this->cleanupWaypointDescription($description);
     }
 
-    public function export(array $fetchedLabs, array $values, array $ownersToSkip, array $finds): string
+    public function export(array $fetchedLabs, array $values, array $ownersToSkip): string
     {
         $xml = '<?xml version="1.0" encoding="utf-8"?>
-                <gpx xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" creator="Groundspeak Pocket Query" xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd http://www.groundspeak.com/cache/1/0/1 http://www.groundspeak.com/cache/1/0/1/cache.xsd" xmlns="http://www.topografix.com/GPX/1/0">
+                <gpx xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" creator="Groundspeak Pocket Query" xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd http://www.groundspeak.com/cache/1/0/1 http://www.groundspeak.com/cache/1/0/1/cache.xsd" xmlns="http://www.topografix.com/GPX/1/0" xmlns:cgeo="http://www.cgeo.org/wptext/1/0">
                     <name>Adventure Labs</name>
                 ';
         $id = -1;
@@ -84,7 +84,7 @@ class GpxExporter extends AbstractExporter
                     continue;
                 }
 
-                $found = $this->isFound($finds, $cache, $wpt);
+                $found = $this->isFound($wpt);
                 if ($found && ! $values['includeFinds']) {
                     $stage++;
                     continue;
@@ -143,7 +143,7 @@ class GpxExporter extends AbstractExporter
                 if ($values['linear'] === 'emoji' && $cache['IsLinear']) {
                     $xml .= '
                     <cgeo:cacheExtension>
-                      <cgeo:assignedEmoji>'.(49+$stage-1).'</cgeo:assignedEmoji>
+                      <cgeo:assignedEmoji>' . (49+$stage-1) . '</cgeo:assignedEmoji>
                     </cgeo:cacheExtension>';
                 }
                 $xml .= '
