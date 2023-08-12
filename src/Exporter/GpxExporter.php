@@ -134,7 +134,7 @@ class GpxExporter extends AbstractExporter
                         <groundspeak:terrain>1</groundspeak:terrain>
                         <groundspeak:country />
                         <groundspeak:state />
-                        <groundspeak:short_description html="True" />
+                        <groundspeak:short_description html="True"' . ($values['includeGeofencing'] ? '>○ ' . $wpt['GeofencingRadius'] . 'm</groundspeak:short_description>' : '/>') . '
                         <groundspeak:long_description html="True">' . $this->gpxEncode($description) . '</groundspeak:long_description>
                         <groundspeak:encoded_hints />
                         <groundspeak:logs />
