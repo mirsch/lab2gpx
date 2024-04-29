@@ -4,17 +4,6 @@ namespace App\Exporter;
 
 class GpxWaypointExporter extends GpxExporter
 {
-    protected function foundAll(array $finds, array $cache): bool
-    {
-        foreach ($cache['GeocacheSummaries'] as $wpt) {
-            if (! $this->isFound($finds, $cache, $wpt)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     protected function getCacheDescription(array $cache, array $values): string
     {
         $description = '<h3>' . $cache['Title'] . '</h3>';
@@ -74,7 +63,7 @@ class GpxWaypointExporter extends GpxExporter
         return $waypointTitle;
     }
 
-    public function export(array $fetchedLabs, array $values, array $ownersToSkip, array $finds): string
+    public function export(array $fetchedLabs, array $values, array $ownersToSkip): string
     {
         $xml = '<?xml version="1.0" encoding="utf-8"?>
                 <gpx xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" creator="Groundspeak Pocket Query" xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd http://www.groundspeak.com/cache/1/0/1 http://www.groundspeak.com/cache/1/0/1/cache.xsd" xmlns="http://www.topografix.com/GPX/1/0">
@@ -82,14 +71,9 @@ class GpxWaypointExporter extends GpxExporter
                     <desc>(HasChildren)</desc>
                 ';
         $id = -1;
-        foreach ($fetchedLabs as $cache) {
-            $cache = $this->getCache($cache['Id']);
+        foreach ($fetchedLabs as $fetchedCache) {
+            $cache = $this->getCache($fetchedCache['Id']);
             if (! $this->includeCache($cache, $values, $ownersToSkip)) {
-                continue;
-            }
-
-            $found = $this->foundAll($finds, $cache);
-            if ($found && ! $values['includeFinds']) {
                 continue;
             }
 
@@ -104,7 +88,7 @@ class GpxWaypointExporter extends GpxExporter
                     <desc>' . $this->gpxEncode($cache['Title']) . '</desc>
                     <url>' . $cache['DeepLink'] . '</url>
                     <urlname>' . $this->gpxEncode($cache['Title']) . '</urlname>
-                    <sym>Geocache' . ($found ? ' Found' : '') . '</sym>
+                    <sym>Geocache' . ($fetchedCache['IsComplete'] ? ' Found' : '') . '</sym>
                     <type>Geocache|' . $values['cacheType'] . '</type>';
             $xml .= '<gsak:wptExtension xmlns:gsak="http://www.gsak.net/xmlv1/5">
                         <gsak:Code>' . $code . '</gsak:Code>

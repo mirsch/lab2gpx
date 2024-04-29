@@ -7,7 +7,7 @@ use Location\Coordinate;
 
 class CacheturDotNoExporter extends AbstractExporter
 {
-    public function export(array $fetchedLabs, array $values, array $ownersToSkip, array $finds): string
+    public function export(array $fetchedLabs, array $values, array $ownersToSkip): string
     {
         $cacheturDotNo = '';
         foreach ($fetchedLabs as $cache) {
@@ -19,12 +19,6 @@ class CacheturDotNoExporter extends AbstractExporter
             $stage = 1;
             foreach ($cache['GeocacheSummaries'] as $wpt) {
                 if (in_array($wpt['Id'], $values['uuidsToExclude'])) {
-                    $stage++;
-                    continue;
-                }
-
-                $found = $this->isFound($finds, $cache, $wpt);
-                if ($found && ! $values['includeFinds']) {
                     $stage++;
                     continue;
                 }

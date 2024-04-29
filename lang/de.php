@@ -21,6 +21,7 @@
 $LANG['INVALID_COORDINATES'] = 'Ungültiges Koordinatenformat.';
 $LANG['INVALID_RADIUS_HIGH'] = 'Der Radius darf nicht größer als 20.000 km sein.';
 $LANG['INVALID_RADIUS_LOW'] = 'Der Radius nicht kleiner als 1 km sein.';
+$LANG['INVALID_GUID'] = 'GUID darf nur die Buchstaben a-f, die Ziffern 0-9 und Minus (-) enthalten';
 $LANG['TAG_LINEAR'] = 'linear';
 $LANG['HEADER_QUESTION'] = 'Frage';
 $LANG['HEADER_WAYPOINT_DESCRIPTION'] = 'Beschreibung der Station';
@@ -32,9 +33,7 @@ $LANG['INTRO'] = '
     <p>Dieses Tool generiert eine GPX Datei mit Geocaching Adventure Labs für diverse Geocaching Apps und Garmin GPS Geräte.</p>
     <p>Die Webseite speichert Deine Einstellungen in einem Cookie (außer Deine Funde). Du solltest das Cookie nicht löschen wenn Du Deine Einstellungen für das nächste Mal behalten willst.</p>
     <p>Bei Problemen oder Funktionswünschen kannst Du gern <a href="https://github.com/mirsch/lab2gpx/issues" target="_blank">ein Ticket schreiben</a>.</p>
-    <p>Einen Hinweis, warum die Tagebucheinträge entfernt wurden findest Du <a href="https://github.com/mirsch/lab2gpx/issues/88" target="_blank">hier</a>.</p>
-    <p>Für andere Anfragen kannst Du folgende E-Mail Adresse verwenden: lab2gpx@gcutils.de 
-    (Fragen zur Bedienung, Fehlermeldungen oder Funktionswünsche werden nicht per E-Mail beantwortet)</p>
+    <p><strong>Update auf API V4</strong>. Die alte Version mit API V3 findest Du hier <a href="https://gcutils.de/lab2gpx/apiv3/">hier</a>.</p>
     ';
 $LANG['LEGEND_GENERAL'] = 'Allgemein';
 $LANG['LEGEND_DESCRIPTION'] = 'Beschreibung';
@@ -49,18 +48,19 @@ $LANG['LABEL_HINT_CACHE_TYPE'] = 'Garmin GPS Geräte unterstützen keine Adventu
 $LANG['LABEL_INCLUDE_QUESTION'] = 'Frage zur Station in Beschreibung einfügen';
 $LANG['LABEL_INCLUDE_DESCRIPTION'] = 'Beschreibung der Station in Cache Beschreibung einfügen';
 $LANG['LABEL_INCLUDE_CACHE_DESCRIPTION'] = 'Beschreibung des Adventure Labs in Cache Beschreibung einfügen';
-$LANG['LABEL_INCLUDE_AWARD'] = 'Tagebucheinträge in Cache Beschreibung einfügen <i>(kann Spoiler enthalten)</i>';
 $LANG['LABEL_EXCLUDE_OWNER'] = 'Owner Name ausschließen (ein Name pro Zeile)';
-$LANG['LABEL_EXCLUDE_FINDS'] = 'Deine Funde ausschließen, Source Code der Seite Deiner Funde kopieren & einfügen';
-$LANG['LABEL_HINT_EXCLUDE_FINDS'] = '
-    Gehe zu <a href="https://labs.geocaching.com/logs" target="_blank">https://labs.geocaching.com/logs</a> und logge Dich ein, so dass Du Deine Logs sehen kannst.
-    Wähle in Deinem Browser "Quelltext anzeigen" und kopiere den gesamten Quelltext in dieses Feld.';
+$LANG['LABEL_USERGUID'] = "Öffentliche GUID für den API-Abruf";
+$LANG['LABEL_HINT_USER_GUID'] = '
+    Rufe die Seite <a href="https://www.geocaching.com/find/default.aspx" target="_blank">https://www.geocaching.com/find/default.aspx</a> auf und suche nach deinem Benutzername. 
+    Die GUID findest du am Ende der URL nach der Suche. (...?guid=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx)';
+$LANG['LABEL_INCLUDE_FOUND'] = 'Komplett abgeschlossene Labs einschließen';
+$LANG['LABEL_INCLUDE_PARTIAL'] = 'Teilweise abgeschlossene Labs einschließen';
+$LANG['LABEL_INCLUDE_UNFOUND'] = 'Nicht begonnene Labs einschließen';
 $LANG['LABEL_DOWNLOAD'] = 'Download';
 $LANG['LABEL_HINT_DOWNLOAD'] = 'Das kann eine Weile dauern. Bitte habe Geduld und klicke nur ein mal.';
 $LANG['NO_CACHES_FOUND'] = '<p>Ooops, an den Koordinaten wurden keine Caches gefunden.</p><p><a href="/lab2gpx/">zurück</a></p>';
 $LANG['CURRENT_POSITION'] = 'meine aktuelle Position';
 $LANG['BROWSER_NO_LOCATION'] = 'Geolocation wird von Deinem Browser nicht unterstützt.';
-$LANG['LABEL_INCLUDE_FINDS'] = 'Funde nicht ausschließen sondern als gefunden markieren';
 $LANG['LABEL_UUIDS_TO_EXCLUDE'] = 'UUIDs ausschließen (<a href="https://github.com/mirsch/lab2gpx/issues/44" target="_blank">#44</a>)';
 $LANG['META_DESCRIPTION'] = 'Generiert GPX Dateien (PQ) für Geocaching Adventure Labs';
 $LANG['INVALID_PREFIX'] = 'Der Präfix muss 2-3 Zeichen lang sein';

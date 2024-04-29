@@ -40,7 +40,7 @@ $logFile = __DIR__ . '/lab2gpx.log';
 $tmpDir = sys_get_temp_dir();
 const CACHE_LIFE_TIME_IN_SECONDS = 24 * 60 * 60;
 
-function fetch(string $url, array $postdata=NULL): string
+function fetch(string $url, array $postdata = null): string
 {
     global $config;
 
@@ -55,7 +55,7 @@ function fetch(string $url, array $postdata=NULL): string
         'x-consumer-key: ' . $config['CONSUMER_KEY'],
     ];
 
-    if(!is_null($postdata)) {
+    if ($postdata !== null) {
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postdata));
         array_push($headers, 'Content-Type: application/json');
@@ -76,10 +76,6 @@ function fetch(string $url, array $postdata=NULL): string
 function fetchLabs(Coordinate $coordinates, array $values, array &$fetchedLabs, $skip = 0)
 {
     global $LANG, $dataDir;
-    $dataDir = implode("/", array_filter([$dataDir, $values['userGuid']]));
-    if (! is_dir($dataDir)) {
-        mkdir($dataDir, 0777, true);
-    }
 
     $max = $values['take'];
     $take = $max;
@@ -103,8 +99,8 @@ function fetchLabs(Coordinate $coordinates, array $values, array &$fetchedLabs, 
         echo $LANG['NO_CACHES_FOUND'];
         exit;
     }
-    $file = $dataDir . '/search_' . md5($url . json_encode($postdata)) . '.json';
-    file_put_contents($file, json_encode($labCaches, JSON_PRETTY_PRINT));
+    // $file = $dataDir . '/search_' . md5($url . json_encode($postdata)) . '.json';
+    // file_put_contents($file, json_encode($labCaches, JSON_PRETTY_PRINT));
 
     foreach ($labCaches['Items'] as $cache) {
         if (count($fetchedLabs) >= $max) {
@@ -116,7 +112,9 @@ function fetchLabs(Coordinate $coordinates, array $values, array &$fetchedLabs, 
             continue;
         }
         @set_time_limit(10);
-        $url = 'https://labs-api.geocaching.com/Api/Adventures/' . $cache['Id'] . '?callerGuid=' . $values['userGuid'];
+        // use unpersonalised cache without user's guid!
+        // $url = 'https://labs-api.geocaching.com/Api/Adventures/' . $cache['Id'] . '?callerGuid=' . $values['userGuid'];
+        $url = 'https://labs-api.geocaching.com/Api/Adventures/' . $cache['Id'];
         $details = fetch($url);
         file_put_contents($file, json_encode(json_decode($details, true), JSON_PRETTY_PRINT));
         $fetchedLabs[] = $cache;
@@ -188,17 +186,15 @@ $values = [
     'includeAwardMessage' => false,
 
     'excludeOwner' => '',
-    'findsHtml' => '',
     'userGuid' => '',
-    'completionStatuses' => [NULL, 1, 2],
-    'includeFinds' => false,
+    'completionStatuses' => [0, 1, 2],
     'uuidsToExclude' => [],
 
     'outputFormat' => 'zippedgpx',
 ];
 $coordinates = CoordinateFactory::fromString($values['coordinates']);
 
-$cookieName = 'lab2gpx_settings_v03';
+$cookieName = 'lab2gpx_settings_v04';
 if (isset($_COOKIE[$cookieName])) {
     $cookieValues = json_decode($_COOKIE[$cookieName], true);
     if ($cookieValues) {
@@ -247,7 +243,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors['prefix'] = $LANG['INVALID_PREFIX'];
     }
 
-    if(preg_match('/[^a-fA-F0-9-]+/', $values['userGuid'])) {
+    if (!$values['userGuid'] || preg_match('/[^a-fA-F0-9-]+/', $values['userGuid'])) {
         $errors['guid'] = $LANG['INVALID_GUID'];
     }
 
@@ -270,7 +266,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (! $errors) {
         $cookieValues = $values;
-        unset($cookieValues['findsHtml']);
         setcookie($cookieName, json_encode($cookieValues), time() + 999999);
 
         if ($config['enable_logging']) {
@@ -289,20 +284,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $ownersToSkip = array_map('trim', $ownersToSkip);
         $ownersToSkip = array_unique($ownersToSkip);
 
-        $finds = [];
-        if ($values['findsHtml'] !== '') {
-            preg_match_all('/<li data-adv-id="([0-9a-z-]*)" class="deletable"(.*)<span class="cache-title">(.*)<\/span>/msU', $values['findsHtml'], $matches);
-            $finds = array_unique($matches[1]);
-            foreach ($matches[1] as $idx => $cacheId) {
-                $foundTitle = html_entity_decode(trim($matches[3][$idx]));
-                // @see user notes at https://www.php.net/manual/de/function.html-entity-decode.php
-                $foundTitle = preg_replace_callback("/(&#[0-9]+;)/", function ($m) {
-                    return mb_convert_encoding($m[1], "UTF-8", "HTML-ENTITIES");
-                }, $foundTitle);
-                $finds[$cacheId][] = $foundTitle;
-            }
-        }
-
         switch ($values['outputFormat']) {
             case 'zippedgpx':
             case 'zippedgpxwpt':
@@ -318,7 +299,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     @unlink($tmpFile);
                     exit;
                 }
-                $xml = $exporter->export($fetchedLabs, $values, $ownersToSkip, $finds);
+                $xml = $exporter->export($fetchedLabs, $values, $ownersToSkip);
                 $zip->addFromString('labs2gpx.gpx', $xml);
                 $zip->close();
                 header("Content-type: application/zip");
@@ -336,7 +317,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } else {
                     $exporter = new GpxExporter($dataDir, $LANG);
                 }
-                $xml = $exporter->export($fetchedLabs, $values, $ownersToSkip, $finds);
+                $xml = $exporter->export($fetchedLabs, $values, $ownersToSkip);
                 header("Content-type: application/gpx+xml");
                 header("Content-Disposition: attachment; filename=labs2gpx.gpx");
                 header("Content-length: " . strlen($xml));
@@ -346,7 +327,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             case 'cacheturdotno':
                 $exporter = new CacheturDotNoExporter($dataDir, $LANG);
-                $cacheturDotNo = $exporter->export($fetchedLabs, $values, $ownersToSkip, $finds);
+                $cacheturDotNo = $exporter->export($fetchedLabs, $values, $ownersToSkip);
                 header("Content-type: text/csv");
                 header("Content-Disposition: attachment; filename=labs2gpx.csv");
                 header("Content-length: " . strlen($cacheturDotNo));
@@ -497,7 +478,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ?>
                 </select>
             </div>
+        </fieldset>
 
+        <fieldset>
+            <div class="form-row<?php echo(isset($errors['guid']) ? ' error' : ''); ?>">
+                <label for="userGuid"><strong><?php echo $LANG['LABEL_USERGUID']; ?>:</strong></label>
+                <input type="text" id="userGuid" name="userGuid" value="<?php echo htmlspecialchars((string) $values['userGuid']); ?>"/>
+                <?php if (isset($errors['guid'])) {
+                    echo '<p class="error">' . $errors['guid'] . '</p>';
+                } ?>
+                <p><?php echo $LANG['LABEL_HINT_USER_GUID']; ?></p>
+            </div>
+
+            <div class="form-row">
+                <label>
+                    <input type="hidden" name="completionStatuses[0]">
+                    <input type="checkbox" name="completionStatuses[0]" value="0"<?php echo ($values['completionStatuses'][0] === '0' ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_INCLUDE_FOUND']; ?>
+                </label>
+                <label>
+                    <input type="hidden" name="completionStatuses[1]">
+                    <input type="checkbox" name="completionStatuses[1]" value="1"<?php echo ($values['completionStatuses'][1] ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_INCLUDE_PARTIAL']; ?>
+                </label>
+                <label>
+                    <input type="hidden" name="completionStatuses[2]">
+                    <input type="checkbox" name="completionStatuses[2]" value="2"<?php echo ($values['completionStatuses'][2] ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_INCLUDE_UNFOUND']; ?>
+                </label>
+            </div>
         </fieldset>
 
         <fieldset>
@@ -520,14 +526,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="checkbox" name="includeCacheDescription"<?php echo($values['includeCacheDescription'] ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_INCLUDE_CACHE_DESCRIPTION']; ?>
                 </label>
             </div>
-            <!--
-            <div class="form-row">
-                <label>
-                    <input type="hidden" name="includeAwardMessage" value="0">
-                    <input type="checkbox" name="includeAwardMessage"<?php echo($values['includeAwardMessage'] ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_INCLUDE_AWARD']; ?>
-                </label>
-            </div>
-            -->
         </fieldset>
 
         <fieldset>
@@ -535,44 +533,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-row">
                 <label for="excludeOwner"><?php echo $LANG['LABEL_EXCLUDE_OWNER']; ?>:</label>
                 <textarea id="excludeOwner" name="excludeOwner" rows="3"><?php echo htmlspecialchars($values['excludeOwner']); ?></textarea>
-            </div>
-
-            <div class="form-row">
-                <label for="findsHtml"><?php echo $LANG['LABEL_EXCLUDE_FINDS']; ?>:</label>
-                <textarea id="findsHtml" name="findsHtml" rows="10"><?php echo htmlspecialchars($values['findsHtml']); ?></textarea>
-                <p><?php echo $LANG['LABEL_HINT_EXCLUDE_FINDS']; ?></p>
-            </div>
-
-            <div class="form-row<?php echo(isset($errors['guid']) ? ' error' : ''); ?>">
-                <label for="userGuid"><?php echo $LANG['LABEL_USERGUID']; ?>:</label>
-                <input type="text" id="userGuid" name="userGuid" value="<?php echo htmlspecialchars((string) $values['userGuid']); ?>"/>
-                <?php if (isset($errors['guid'])) {
-                    echo '<p class="error">' . $errors['guid'] . '</p>';
-                } ?>
-                <p><?php echo $LANG['LABEL_HINT_USER_GUID']; ?></p>
-            </div>
-
-            <div class="form-row">
-                <label>
-                    <input type="hidden" name="completionStatuses[0]">
-                    <input type="checkbox" name="completionStatuses[0]" value="0"<?php echo($values['completionStatuses'][0] ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_INCLUDE_FOUND']; ?>
-                </label>
-                <label>
-                    <input type="hidden" name="completionStatuses[1]">
-                    <input type="checkbox" name="completionStatuses[1]" value="1"<?php echo($values['completionStatuses'][1] ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_INCLUDE_PARTIAL']; ?>
-                </label>
-                <label>
-                    <input type="hidden" name="completionStatuses[2]">
-                    <input type="checkbox" name="completionStatuses[2]" value="2"<?php echo($values['completionStatuses'][2] ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_INCLUDE_UNFOUND']; ?>
-                </label>
-            </div>
-
-
-            <div class="form-row">
-                <label>
-                    <input type="hidden" name="includeFinds" value="0">
-                    <input type="checkbox" name="includeFinds"<?php echo($values['includeFinds'] ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_INCLUDE_FINDS']; ?>
-                </label>
             </div>
 
             <div class="form-row">

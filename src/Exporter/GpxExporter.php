@@ -64,15 +64,15 @@ class GpxExporter extends AbstractExporter
         return $this->cleanupWaypointDescription($description);
     }
 
-    public function export(array $fetchedLabs, array $values, array $ownersToSkip, array $finds): string
+    public function export(array $fetchedLabs, array $values, array $ownersToSkip): string
     {
         $xml = '<?xml version="1.0" encoding="utf-8"?>
                 <gpx xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" creator="Groundspeak Pocket Query" xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd http://www.groundspeak.com/cache/1/0/1 http://www.groundspeak.com/cache/1/0/1/cache.xsd" xmlns="http://www.topografix.com/GPX/1/0">
                     <name>Adventure Labs</name>
                 ';
         $id = -1;
-        foreach ($fetchedLabs as $cache) {
-            $cache = $this->getCache($cache['Id']);
+        foreach ($fetchedLabs as $fetchedCache) {
+            $cache = $this->getCache($fetchedCache['Id']);
             if (! $this->includeCache($cache, $values, $ownersToSkip)) {
                 continue;
             }
@@ -80,12 +80,6 @@ class GpxExporter extends AbstractExporter
             $stage = 1;
             foreach ($cache['GeocacheSummaries'] as $wpt) {
                 if (in_array($wpt['Id'], $values['uuidsToExclude'])) {
-                    $stage++;
-                    continue;
-                }
-
-                $found = $this->isFound($finds, $cache, $wpt);
-                if ($found && ! $values['includeFinds']) {
                     $stage++;
                     continue;
                 }
@@ -106,7 +100,7 @@ class GpxExporter extends AbstractExporter
                     <desc>' . $this->gpxEncode($wpt['Title']) . '</desc>
                     <url>' . $cache['DeepLink'] . '</url>
                     <urlname>S' . $displayStage . ' ' . $this->gpxEncode($cache['Title']) . '</urlname>
-                    <sym>Geocache' . ($found ? ' Found' : '') . '</sym>
+                    <sym>Geocache' . ($fetchedCache['IsComplete'] ? ' Found' : '') . '</sym>
                     <type>Geocache|' . $values['cacheType'] . '</type>';
                 $xml .= '<gsak:wptExtension xmlns:gsak="http://www.gsak.net/xmlv1/5">
                         <gsak:Code>' . $code . '</gsak:Code>
