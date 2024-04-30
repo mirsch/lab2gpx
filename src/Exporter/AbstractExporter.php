@@ -20,6 +20,13 @@ abstract class AbstractExporter
 
     protected function getFileCache(array $fetchedCache): array
     {
+        // partial labs not from cache
+        if (isset($fetchedCache['CompletedGeocachesCount']) && isset($fetchedCache['TotalGeocachesCount'])) {
+            if ($fetchedCache['CompletedGeocachesCount'] < $fetchedCache['TotalGeocachesCount']) {
+                return $fetchedCache;
+            }
+        }
+
         $file = $this->dataDir . '/' . $fetchedCache['Id'] . '.json';
         if (! file_exists($file)) {
             return $fetchedCache;
