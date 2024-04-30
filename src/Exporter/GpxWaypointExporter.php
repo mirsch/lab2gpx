@@ -72,7 +72,7 @@ class GpxWaypointExporter extends GpxExporter
                 ';
         $id = -1;
         foreach ($fetchedLabs as $fetchedCache) {
-            $cache = $this->getCache($fetchedCache['Id']);
+            $cache = $this->getFileCache($fetchedCache);
             if (! $this->includeCache($cache, $values, $ownersToSkip)) {
                 continue;
             }
@@ -128,6 +128,10 @@ class GpxWaypointExporter extends GpxExporter
             foreach ($cache['GeocacheSummaries'] as $wpt) {
                 if (in_array($wpt['Id'], $values['uuidsToExclude'])) {
                     $stage++;
+                    continue;
+                }
+
+                if ($wpt['IsComplete'] && !in_array('0', $values['completionStatuses'])) {
                     continue;
                 }
 

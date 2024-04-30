@@ -18,9 +18,12 @@ abstract class AbstractExporter
 
     abstract public function export(array $fetchedLabs, array $values, array $ownersToSkip): string;
 
-    protected function getCache(string $id): array
+    protected function getFileCache(array $fetchedCache): array
     {
-        $file = $this->dataDir . '/' . $id . '.json';
+        $file = $this->dataDir . '/' . $fetchedCache['Id'] . '.json';
+        if (! file_exists($file)) {
+            return $fetchedCache;
+        }
 
         return json_decode(file_get_contents($file), true);
     }

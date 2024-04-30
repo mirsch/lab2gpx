@@ -11,7 +11,7 @@ class CacheturDotNoExporter extends AbstractExporter
     {
         $cacheturDotNo = '';
         foreach ($fetchedLabs as $cache) {
-            $cache = $this->getCache($cache['Id']);
+            $cache = $this->getFileCache($cache);
             if (! $this->includeCache($cache, $values, $ownersToSkip)) {
                 continue;
             }
@@ -20,6 +20,10 @@ class CacheturDotNoExporter extends AbstractExporter
             foreach ($cache['GeocacheSummaries'] as $wpt) {
                 if (in_array($wpt['Id'], $values['uuidsToExclude'])) {
                     $stage++;
+                    continue;
+                }
+
+                if ($wpt['IsComplete'] && !in_array('0', $values['completionStatuses'])) {
                     continue;
                 }
 

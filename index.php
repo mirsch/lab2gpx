@@ -33,6 +33,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 const IN_APP = true;
 $config['CONSUMER_KEY'] = 'THE-TOP-SECRET-CONSUMER-KEY';
 $config['enable_logging'] = false;
+$config['save_debug_files'] = false;
 require_once __DIR__ . '/config.local.php';
 
 $dataDir = __DIR__ . '/data';
@@ -75,7 +76,7 @@ function fetch(string $url, array $postdata = null): string
 
 function fetchLabs(Coordinate $coordinates, array $values, array &$fetchedLabs, $skip = 0)
 {
-    global $LANG, $dataDir;
+    global $LANG, $dataDir, $completionStatuses, $config;
 
     $max = $values['take'];
     $take = $max;
@@ -83,12 +84,16 @@ function fetchLabs(Coordinate $coordinates, array $values, array &$fetchedLabs, 
         $take = 500;
     }
 
+    $status = $values['completionStatuses'];
+    if (count($status) >= $completionStatuses) {
+        $status = [];
+    }
     $postdata = [
         'Origin' => ['Latitude' => $coordinates->getLat(), 'Longitude' => $coordinates->getLng()],
         'RadiusInMeters' => $values['radius']*1000, 'skip' => $skip, 'take' => $take,
 
         'CallingUserPublicGuid' => $values['userGuid'],
-        'CompletionStatuses' => array_values(array_filter($values['completionStatuses'], 'strlen'))
+        'CompletionStatuses' => $status,
     ];
 
     $url = "https://labs-api.geocaching.com/Api/Adventures/SearchV4";
@@ -99,25 +104,42 @@ function fetchLabs(Coordinate $coordinates, array $values, array &$fetchedLabs, 
         echo $LANG['NO_CACHES_FOUND'];
         exit;
     }
-    // $file = $dataDir . '/search_' . md5($url . json_encode($postdata)) . '.json';
-    // file_put_contents($file, json_encode($labCaches, JSON_PRETTY_PRINT));
+
+    if ($config['save_debug_files']) {
+        $file = $dataDir . '/search_' . md5($url . json_encode($postdata)) . '.json';
+        file_put_contents($file, json_encode($labCaches, JSON_PRETTY_PRINT));
+    }
 
     foreach ($labCaches['Items'] as $cache) {
         if (count($fetchedLabs) >= $max) {
             return;
         }
+        $fileCacheEnabled = true;
+        if ($cache['CompletionStatus'] === 1) {
+            $fileCacheEnabled = false;
+        }
+
         $file = $dataDir . '/' . $cache['Id'] . '.json';
-        if (file_exists($file) && filemtime($file) > time() - CACHE_LIFE_TIME_IN_SECONDS) {
+        if ($fileCacheEnabled && file_exists($file) && filemtime($file) > time() - CACHE_LIFE_TIME_IN_SECONDS) {
             $fetchedLabs[] = $cache;
             continue;
         }
         @set_time_limit(10);
-        // use unpersonalised cache without user's guid!
-        // $url = 'https://labs-api.geocaching.com/Api/Adventures/' . $cache['Id'] . '?callerGuid=' . $values['userGuid'];
         $url = 'https://labs-api.geocaching.com/Api/Adventures/' . $cache['Id'];
+        if (!$fileCacheEnabled) {
+            $url = 'https://labs-api.geocaching.com/Api/Adventures/' . $cache['Id'] . '?callerGuid=' . $values['userGuid'];
+        }
         $details = fetch($url);
-        file_put_contents($file, json_encode(json_decode($details, true), JSON_PRETTY_PRINT));
-        $fetchedLabs[] = $cache;
+        $details = json_decode($details, true);
+        if ($config['save_debug_files']) {
+            file_put_contents($file, json_encode($details, JSON_PRETTY_PRINT));
+        }
+        if ($fileCacheEnabled) {
+            file_put_contents($file, json_encode($details, JSON_PRETTY_PRINT));
+            $fetchedLabs[] = $cache;
+        } else {
+            $fetchedLabs[] = $details;
+        }
     }
 
     $total = (int) $labCaches['TotalCount'];
@@ -171,6 +193,7 @@ $outputFormats = [
     'gpxwpt' => $LANG['OUTPUT_GPX_WPT'],
     'cacheturdotno' => $LANG['OUTPUT_CACHETUR_DOT_NO'],
 ];
+$completionStatuses = ['0', '1', '2'];
 $values = [
     'coordinates' => 'N50° 50.156 E012° 55.398',
     'radius' => 15,
@@ -187,14 +210,14 @@ $values = [
 
     'excludeOwner' => '',
     'userGuid' => '',
-    'completionStatuses' => [0, 1, 2],
+    'completionStatuses' => $completionStatuses,
     'uuidsToExclude' => [],
 
     'outputFormat' => 'zippedgpx',
 ];
 $coordinates = CoordinateFactory::fromString($values['coordinates']);
 
-$cookieName = 'lab2gpx_settings_v04';
+$cookieName = 'lab2gpx_settings_v04_01';
 if (isset($_COOKIE[$cookieName])) {
     $cookieValues = json_decode($_COOKIE[$cookieName], true);
     if ($cookieValues) {
@@ -245,6 +268,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!$values['userGuid'] || preg_match('/[^a-fA-F0-9-]+/', $values['userGuid'])) {
         $errors['guid'] = $LANG['INVALID_GUID'];
+    }
+
+    $diff = array_diff($values['completionStatuses'], $completionStatuses);
+    // use default in case of invalid value
+    if (count($diff)) {
+        $values['completionStatuses'] = $completionStatuses;
     }
 
     if (! array_key_exists($values['linear'], $linearTypes)) {
@@ -492,16 +521,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="form-row">
                 <label>
-                    <input type="hidden" name="completionStatuses[0]">
-                    <input type="checkbox" name="completionStatuses[0]" value="0"<?php echo ($values['completionStatuses'][0] === '0' ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_INCLUDE_FOUND']; ?>
+                    <input type="checkbox" name="completionStatuses[]" value="0"<?php echo (in_array('0', $values['completionStatuses']) ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_INCLUDE_FOUND']; ?>
                 </label>
                 <label>
-                    <input type="hidden" name="completionStatuses[1]">
-                    <input type="checkbox" name="completionStatuses[1]" value="1"<?php echo ($values['completionStatuses'][1] ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_INCLUDE_PARTIAL']; ?>
+                    <input type="checkbox" name="completionStatuses[]" value="1"<?php echo (in_array('1', $values['completionStatuses']) ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_INCLUDE_PARTIAL']; ?>
                 </label>
                 <label>
-                    <input type="hidden" name="completionStatuses[2]">
-                    <input type="checkbox" name="completionStatuses[2]" value="2"<?php echo ($values['completionStatuses'][2] ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_INCLUDE_UNFOUND']; ?>
+                    <input type="checkbox" name="completionStatuses[]" value="2"<?php echo (in_array('2', $values['completionStatuses']) ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_INCLUDE_UNFOUND']; ?>
                 </label>
             </div>
         </fieldset>
