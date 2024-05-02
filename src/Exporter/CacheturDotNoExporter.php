@@ -24,6 +24,7 @@ class CacheturDotNoExporter extends AbstractExporter
                 }
 
                 if ($wpt['IsComplete'] && !in_array('0', $values['completionStatuses'])) {
+                    $stage++;
                     continue;
                 }
 

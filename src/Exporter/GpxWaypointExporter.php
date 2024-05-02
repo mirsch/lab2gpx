@@ -132,6 +132,7 @@ class GpxWaypointExporter extends GpxExporter
                 }
 
                 if ($wpt['IsComplete'] && !in_array('0', $values['completionStatuses'])) {
+                    $stage++;
                     continue;
                 }
 
