@@ -88,7 +88,7 @@ class GpxWaypointExporter extends GpxExporter
                     <desc>' . $this->gpxEncode($cache['Title']) . '</desc>
                     <url>' . $cache['DeepLink'] . '</url>
                     <urlname>' . $this->gpxEncode($cache['Title']) . '</urlname>
-                    <sym>Geocache' . ($fetchedCache['IsComplete'] ? ' Found' : '') . '</sym>
+                    <sym>Geocache' . ($fetchedCache['IsComplete'] || $cache['IsComplete'] ? ' Found' : '') . '</sym>
                     <type>Geocache|' . $values['cacheType'] . '</type>';
             $xml .= '<gsak:wptExtension xmlns:gsak="http://www.gsak.net/xmlv1/5">
                         <gsak:Code>' . $code . '</gsak:Code>
