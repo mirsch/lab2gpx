@@ -2,6 +2,8 @@
 
 namespace App\Exporter;
 
+use App\LabCode;
+
 abstract class AbstractExporter
 {
     protected array $usedCodes = [];
@@ -85,11 +87,9 @@ abstract class AbstractExporter
             $stage = 0;
         }
         $codeCnt = 0;
-        // the firebase link contains upper and lower case letters so there may be collisions if we convert it to upper case
-        $fixedPart = str_replace('https://adventurelab.page.link/', '', $cache['FirebaseDynamicLink']);
-        if (! $values['codeIsCaseSensitive']) {
-            $fixedPart = strtoupper($fixedPart);
-        }
+
+        $LabCode = new LabCode($this->dataDir);
+        $fixedPart = $LabCode->uuid2LabCode($cache['Id']);
         while (! $code || (in_array($code, $this->usedCodes) && $codeCnt < 16)) {
             $code = strtoupper($prefix) . $fixedPart . ($codeCnt ? $codeCnt : '');
             if ($stage) {
