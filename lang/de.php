@@ -41,7 +41,7 @@ $LANG['LEGEND_DOWNLOAD'] = 'Download';
 $LANG['LABEL_COORDINATES'] = 'Koordinaten z.B. 50.83593, 12.92329 oder N50° 50.156 E012° 55.397';
 $LANG['LABEL_MAP'] = 'Oder klicke auf die Karte um eine Position zu wählen.';
 $LANG['LABEL_RADIUS'] = 'Radius in km';
-$LANG['LABEL_TAKE'] = 'Max. Anzahl Caches (1 bis 500)';
+$LANG['LABEL_LIMIT'] = 'Max. Anzahl Adventures (0 = kein Limit, ACHTUNG: der Download kann ohne Limit sehr sehr lange dauern und auch mit timeout abbrechen. ggf. Radius verkleinern oder Limit passend wählen)';
 $LANG['LABEL_CACHE_TYPE'] = 'Cache Typ';
 $LANG['LABEL_HINT_CACHE_TYPE'] = 'Garmin GPS Geräte unterstützen keine Adventure Labs. Vielleicht willst Du sie lieber als virtuelle Caches exportieren.';
 $LANG['LABEL_INCLUDE_QUESTION'] = 'Frage zur Station in Beschreibung einfügen';

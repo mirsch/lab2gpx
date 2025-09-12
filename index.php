@@ -79,11 +79,10 @@ function fetchLabs(Coordinate $coordinates, array $values, array &$fetchedLabs, 
 {
     global $LANG, $cacheDir, $completionStatuses, $config;
 
-    $max = $values['take'];
-    $take = $max;
-    if ($take > 500) {
-        $take = 500;
-    }
+    $limit = $values['limit'];
+
+    // downloads per iteration
+    $take = 300;
 
     $status = $values['completionStatuses'];
     if (count($status) >= $completionStatuses) {
@@ -112,7 +111,7 @@ function fetchLabs(Coordinate $coordinates, array $values, array &$fetchedLabs, 
     }
 
     foreach ($labCaches['Items'] as $cache) {
-        if (count($fetchedLabs) >= $max) {
+        if ($limit > 0 && count($fetchedLabs) >= $limit) {
             return;
         }
         $fileCacheEnabled = true;
@@ -144,7 +143,8 @@ function fetchLabs(Coordinate $coordinates, array $values, array &$fetchedLabs, 
     }
 
     $total = (int) $labCaches['TotalCount'];
-    if ($max <= $total && ($skip + 1) * $take < $max && count($fetchedLabs) < $max) {
+    if (count($fetchedLabs) < $total) {
+        @set_time_limit(10);
         fetchLabs($coordinates, $values, $fetchedLabs, $skip + $take);
     }
 }
@@ -198,7 +198,7 @@ $completionStatuses = ['0', '1', '2'];
 $values = [
     'coordinates' => 'N50° 50.156 E012° 55.398',
     'radius' => 15,
-    'take' => 300,
+    'limit' => 300,
     'cacheType' => $cacheTypes[0],
     'prefix' => 'LC',
     'linear' => 'default',
@@ -250,12 +250,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors['radius'] = $LANG['INVALID_RADIUS_LOW'];
     }
 
-    $values['take'] = (int) $values['take'];
-    if ($values['take'] > 1000) {
-        $values['take'] = 1000;
-    }
-    if ($values['take'] < 1) {
-        $values['take'] = 1;
+    $values['limit'] = (int) $values['limit'];
+    if ($values['limit'] < 1) {
+        $values['limit'] = 0;
     }
 
     if (! in_array($values['cacheType'], $cacheTypes)) {
@@ -462,11 +459,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } ?>
             </div>
 
-            <div class="form-row<?php echo(isset($errors['take']) ? ' error' : ''); ?>">
-                <label for="take"><?php echo $LANG['LABEL_TAKE']; ?>:</label>
-                <input type="text" id="take" name="take" value="<?php echo htmlspecialchars((string) $values['take']); ?>"/>
-                <?php if (isset($errors['take'])) {
-                    echo '<p class="error">' . $errors['take'] . '</p>';
+            <div class="form-row<?php echo(isset($errors['limit']) ? ' error' : ''); ?>">
+                <label for="limit"><?php echo $LANG['LABEL_LIMIT']; ?>:</label>
+                <input type="text" id="limit" name="limit" value="<?php echo htmlspecialchars((string) $values['limit']); ?>"/>
+                <?php if (isset($errors['limit'])) {
+                    echo '<p class="error">' . $errors['limit'] . '</p>';
                 } ?>
             </div>
 
@@ -483,7 +480,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <div class="form-row<?php echo(isset($errors['prefix']) ? ' error' : ''); ?>">
-                <label for="take"><?php echo $LANG['LABEL_PREFIX']; ?>:</label>
+                <label for="prefix"><?php echo $LANG['LABEL_PREFIX']; ?>:</label>
                 <input type="text" id="prefix" name="prefix" value="<?php echo htmlspecialchars((string) $values['prefix']); ?>"/>
                 <?php if (isset($errors['prefix'])) {
                     echo '<p class="error">' . $errors['prefix'] . '</p>';
