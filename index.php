@@ -200,7 +200,6 @@ $values = [
     'take' => 300,
     'cacheType' => $cacheTypes[0],
     'prefix' => 'LC',
-    'codeIsCaseSensitive' => false,
     'linear' => 'default',
 
     'includeQuestion' => true,
@@ -488,13 +487,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php if (isset($errors['prefix'])) {
                     echo '<p class="error">' . $errors['prefix'] . '</p>';
                 } ?>
-            </div>
-
-            <div class="form-row">
-                <label>
-                    <input type="hidden" name="codeIsCaseSensitive" value="0">
-                    <input type="checkbox" name="codeIsCaseSensitive"<?php echo($values['codeIsCaseSensitive'] ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_CODE_IS_CASE_SENSITIVE']; ?>
-                </label>
             </div>
 
             <div class="form-row">
