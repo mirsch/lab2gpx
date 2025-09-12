@@ -33,7 +33,6 @@ $LANG['INTRO'] = '
     <p>Dieses Tool generiert eine GPX Datei mit Geocaching Adventure Labs für diverse Geocaching Apps und Garmin GPS Geräte.</p>
     <p>Die Webseite speichert Deine Einstellungen in einem Cookie (außer Deine Funde). Du solltest das Cookie nicht löschen wenn Du Deine Einstellungen für das nächste Mal behalten willst.</p>
     <p>Bei Problemen oder Funktionswünschen kannst Du gern <a href="https://github.com/mirsch/lab2gpx/issues" target="_blank">ein Ticket schreiben</a>.</p>
-    <p><strong>Update auf API V4</strong>. Die alte Version mit API V3 findest Du hier <a href="https://gcutils.de/lab2gpx/apiv3/">hier</a>.</p>
     ';
 $LANG['LEGEND_GENERAL'] = 'Allgemein';
 $LANG['LEGEND_DESCRIPTION'] = 'Beschreibung';
