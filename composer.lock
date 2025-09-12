@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "34c59412a399610a91adab2455becfa2",
+    "content-hash": "833dff1da5cb5510605b8bd22a321a11",
     "packages": [
         {
             "name": "mjaschen/phpgeo",
@@ -83,11 +83,11 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.4",
+        "php": ">=8.4",
         "ext-curl": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
@@ -95,6 +95,6 @@
         "ext-pdo": "*",
         "ext-sqlite3": "*"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
 }

@@ -36,12 +36,13 @@ $config['enable_logging'] = false;
 $config['save_debug_files'] = false;
 require_once __DIR__ . '/config.local.php';
 
-$dataDir = __DIR__ . '/data';
-$logFile = __DIR__ . '/lab2gpx.log';
+$cacheDir = __DIR__ . '/data/cache';
+$databaseDir = __DIR__ . '/data/db';
+$logFile = __DIR__ . '/data/logs/lab2gpx.log';
 $tmpDir = sys_get_temp_dir();
 const CACHE_LIFE_TIME_IN_SECONDS = 24 * 60 * 60;
 
-function fetch(string $url, array $postdata = null): string
+function fetch(string $url, ?array $postdata = null): string
 {
     global $config;
 
@@ -76,7 +77,7 @@ function fetch(string $url, array $postdata = null): string
 
 function fetchLabs(Coordinate $coordinates, array $values, array &$fetchedLabs, $skip = 0)
 {
-    global $LANG, $dataDir, $completionStatuses, $config;
+    global $LANG, $cacheDir, $completionStatuses, $config;
 
     $max = $values['take'];
     $take = $max;
@@ -106,7 +107,7 @@ function fetchLabs(Coordinate $coordinates, array $values, array &$fetchedLabs, 
     }
 
     if ($config['save_debug_files']) {
-        $file = $dataDir . '/search_' . md5($url . json_encode($postdata)) . '.json';
+        $file = $cacheDir . '/search_' . md5($url . json_encode($postdata)) . '.json';
         file_put_contents($file, json_encode($labCaches, JSON_PRETTY_PRINT));
     }
 
@@ -119,7 +120,7 @@ function fetchLabs(Coordinate $coordinates, array $values, array &$fetchedLabs, 
             $fileCacheEnabled = false;
         }
 
-        $file = $dataDir . '/' . $cache['Id'] . '.json';
+        $file = $cacheDir . '/' . $cache['Id'] . '.json';
         if ($fileCacheEnabled && file_exists($file) && filemtime($file) > time() - CACHE_LIFE_TIME_IN_SECONDS) {
             $fetchedLabs[] = $cache;
             continue;
@@ -148,8 +149,8 @@ function fetchLabs(Coordinate $coordinates, array $values, array &$fetchedLabs, 
     }
 }
 
-if (! is_dir($dataDir)) {
-    mkdir($dataDir, 0777, true);
+if (! is_dir($cacheDir)) {
+    mkdir($cacheDir, 0777, true);
 }
 
 header('Vary: Accept-Language');
@@ -316,9 +317,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'zippedgpx':
             case 'zippedgpxwpt':
                 if ($values['outputFormat'] === 'zippedgpxwpt') {
-                    $exporter = new GpxWaypointExporter($dataDir, $LANG);
+                    $exporter = new GpxWaypointExporter($cacheDir, $databaseDir, $LANG);
                 } else {
-                    $exporter = new GpxExporter($dataDir, $LANG);
+                    $exporter = new GpxExporter($cacheDir, $databaseDir, $LANG);
                 }
                 $zip = new ZipArchive;
                 $tmpFile = tempnam($tmpDir, 'lab2gpx');
@@ -341,9 +342,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'gpx':
             case 'gpxwpt':
                 if ($values['outputFormat'] === 'gpxwpt') {
-                    $exporter = new GpxWaypointExporter($dataDir, $LANG);
+                    $exporter = new GpxWaypointExporter($cacheDir, $databaseDir, $LANG);
                 } else {
-                    $exporter = new GpxExporter($dataDir, $LANG);
+                    $exporter = new GpxExporter($cacheDir, $databaseDir, $LANG);
                 }
                 $xml = $exporter->export($fetchedLabs, $values, $ownersToSkip);
                 header("Content-type: application/gpx+xml");
@@ -354,7 +355,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo $xml;
                 exit;
             case 'cacheturdotno':
-                $exporter = new CacheturDotNoExporter($dataDir, $LANG);
+                $exporter = new CacheturDotNoExporter($cacheDir, $databaseDir, $LANG);
                 $cacheturDotNo = $exporter->export($fetchedLabs, $values, $ownersToSkip);
                 header("Content-type: text/csv");
                 header("Content-Disposition: attachment; filename=labs2gpx.csv");

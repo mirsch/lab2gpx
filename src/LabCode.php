@@ -4,26 +4,16 @@ namespace App;
 
 class LabCode
 {
-    protected string $dataDir;
-
-    /**
-     * LabCode constructor.
-     * @param string $dataDir
-     */
-    public function __construct(string $dataDir)
+    public function __construct(private readonly string $dataDir)
     {
-        $this->dataDir = $dataDir;
     }
 
     /**
      * convert a UUID to a unique lab code using database lookup
-     *
-     * @param string $uuid
      * @return string  // Lab code in base31 format without prefix and suffix
      */
     public function uuid2LabCode(string $uuid): string
     {
-        // Search in Database for uuid and return lab code, if found.
         $pdo = $this->getDatabase();
         $stmt = $pdo->prepare("SELECT lab_code FROM lab_codes WHERE uuid = :uuid");
         $stmt->execute(['uuid' => $uuid]);
@@ -33,20 +23,20 @@ class LabCode
             return $labCode;
         }
 
-        // If not found insert uuid to database and return DB id and convert it using base31 to lab code
+        $pdo->beginTransaction();
         $stmt = $pdo->prepare("INSERT INTO lab_codes (uuid) VALUES (:uuid)");
         $stmt->execute(['uuid' => $uuid]);
         $id = $pdo->lastInsertId();
-        $labCode = self::convertToBase31((int)$id);
+        $labCode = $this->convertToBase31((int)$id);
 
-        // Update the database with the new lab code
         $stmt = $pdo->prepare("UPDATE lab_codes SET lab_code = :lab_code WHERE id = :id");
         $stmt->execute(['lab_code' => $labCode, 'id' => $id]);
+        $pdo->commit();
 
         return $labCode;
     }
 
-    private static function convertToBase31(int $id): string
+    private function convertToBase31(int $id): string
     {
         $base31 = '';
         $alphabet = '0123456789ABCDEFGHJKMNPQRTVWXYZ'; // Base 31 alphabet without 'ILOSU' (like GC Code)
@@ -57,31 +47,29 @@ class LabCode
         return $base31;
     }
 
-    /**
-     * Returns a persistent SQLite database connection.
-     * Ensures the required table exists.
-     *
-     * @return \PDO
-     */
-    private function getDatabase()
+    private function getDatabase(): \PDO
     {
-        // Path to the persistent SQLite database file
         $dbPath = $this->dataDir . '/labcodes.sqlite';
+        $isNewDatabase = false;
+        if (!file_exists($dbPath)) {
+            $isNewDatabase = true;
+        }
 
-        // Create or open the SQLite database
         $pdo = new \PDO('sqlite:' . $dbPath);
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
-        // Create the table if it does not exist
-        $pdo->exec(
-            "CREATE TABLE IF NOT EXISTS lab_codes (
+        if ($isNewDatabase) {
+            $pdo->exec(
+                "CREATE TABLE IF NOT EXISTS lab_codes (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 uuid TEXT UNIQUE NOT NULL,
                 lab_code TEXT
-            )"
-        );
-        // Create index after table creation
-        $pdo->exec("CREATE INDEX IF NOT EXISTS idx_lab_codes_uuid ON lab_codes(uuid)");
+            )");
+            $pdo->exec("CREATE INDEX IF NOT EXISTS idx_lab_codes_uuid ON lab_codes(uuid)");
+            // initial id, just because I don't like the short codes around 30k is where base31 becomes 4 digits
+            $pdo->exec("INSERT INTO lab_codes (id, uuid) VALUES (30000, 'delete_me')");
+            $pdo->exec('DELETE FROM lab_codes WHERE id = 30000');
+        }
 
         return $pdo;
     }

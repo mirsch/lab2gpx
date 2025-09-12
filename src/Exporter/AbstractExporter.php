@@ -8,14 +8,11 @@ abstract class AbstractExporter
 {
     protected array $usedCodes = [];
 
-    protected string $dataDir;
-
-    protected array $locale;
-
-    public function __construct(string $dataDir, array $locale)
-    {
-        $this->dataDir = $dataDir;
-        $this->locale = $locale;
+    public function __construct(
+        private readonly string $cacheDir,
+        private readonly string $databaseDir,
+        protected readonly array $locale,
+    ) {
     }
 
     abstract public function export(array $fetchedLabs, array $values, array $ownersToSkip): string;
@@ -29,7 +26,8 @@ abstract class AbstractExporter
             }
         }
 
-        $file = $this->dataDir . '/' . $fetchedCache['Id'] . '.json';
+
+        $file = $this->cacheDir . '/' . $fetchedCache['Id'] . '.json';
         if (! file_exists($file)) {
             return $fetchedCache;
         }
@@ -88,7 +86,7 @@ abstract class AbstractExporter
         }
         $codeCnt = 0;
 
-        $LabCode = new LabCode($this->dataDir);
+        $LabCode = new LabCode($this->databaseDir);
         $fixedPart = $LabCode->uuid2LabCode($cache['Id']);
         while (! $code || (in_array($code, $this->usedCodes) && $codeCnt < 16)) {
             $code = strtoupper($prefix) . $fixedPart . ($codeCnt ? $codeCnt : '');
