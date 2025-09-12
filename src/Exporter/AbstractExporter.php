@@ -73,7 +73,6 @@ abstract class AbstractExporter
 
     protected function getCode(array $cache, array $values, int $stage, bool $useStageAsPrefix = false): string
     {
-        $code = '';
         $stage = $stage ? str_pad((string) $stage, 2, '0', STR_PAD_LEFT) : 0;
         $prefix = $values['prefix'];
         if ($useStageAsPrefix) {
@@ -84,19 +83,9 @@ abstract class AbstractExporter
             }
             $stage = 0;
         }
-        $codeCnt = 0;
 
         $LabCode = new LabCode($this->databaseDir);
         $fixedPart = $LabCode->uuid2LabCode($cache['Id']);
-        while (! $code || (in_array($code, $this->usedCodes) && $codeCnt < 16)) {
-            $code = strtoupper($prefix) . $fixedPart . ($codeCnt ? $codeCnt : '');
-            if ($stage) {
-                $code .= $stage;
-            }
-            $codeCnt++;
-        }
-        $this->usedCodes[] = $code;
-
-        return $code;
+        return strtoupper($prefix) . $fixedPart . ($stage ? ('-' . $stage) : '');
     }
 }
