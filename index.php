@@ -54,7 +54,7 @@ function fetch(string $url, ?array $postdata = null): string
 
     $headers = [
         'Accept: application/json',
-        'x-consumer-key: ' . $config['CONSUMER_KEY'],
+        'X-Consumer-Key: ' . $config['CONSUMER_KEY'],
     ];
 
     if ($postdata !== null) {

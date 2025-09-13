@@ -24,10 +24,14 @@ $LANG['INVALID_RADIUS_LOW'] = 'Radius must not be lower than 1 km.';
 $LANG['INVALID_GUID'] = 'GUID must only contain letters a-f, numbers 0-9 and hyphen (-)';
 $LANG['TAG_LINEAR'] = 'linear';
 $LANG['HEADER_QUESTION'] = 'Question';
+$LANG['HEADER_QUESTION_TYPE'] = 'Kind of question';
+$LANG['HEADER_QUESTION_TYPE_VALUE'][0] = 'single';
+$LANG['HEADER_QUESTION_TYPE_VALUE'][1] = 'multiple choice';
 $LANG['HEADER_WAYPOINT_DESCRIPTION'] = 'Waypoint Description';
 $LANG['HEADER_LAB_DESCRIPTION'] = 'Adventure Lab Descriptions';
 $LANG['HEADER_AWARD'] = 'Award Information';
 $LANG['HEADER_AWARD_MESSAGE'] = 'Award Message';
+$LANG['HEADER_GEOFENCING_RADIUS'] = 'Radius';
 $LANG['ERROR_ZIP_FAILED'] = 'Sorry, some thing went wrong. File not created.';
 $LANG['INTRO'] = '
     <p>This tool generates a GPX file containing Geocaching Adventure Labs for use in several Geocaching Apps and Garmin GPS devices.</p>

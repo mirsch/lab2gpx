@@ -6,51 +6,55 @@ class GpxWaypointExporter extends GpxExporter
 {
     protected function getCacheDescription(array $cache, array $values): string
     {
-        $description = '<h3>' . $cache['Title'] . '</h3>';
+        $description = '<h3>' . $this->escape($cache['Title']) . '</h3>';
         if ($cache['IsLinear']) {
-            $description .= '<p><span style="background:#990000;color:#fff;border-radius:5px;padding:3px 5px;">' . $this->locale['TAG_LINEAR'] . '</span></p>';
+            $description .= '<p><span style="background:#990000;color:#fff;border-radius:5px;padding:3px 5px;">' . $this->escape($this->locale['TAG_LINEAR']) . '</span></p>';
         }
-        $description .= '<p><a href="' . $cache['DeepLink'] . '">' . $cache['DeepLink'] . '</a></p>';
+        $description .= '<p><a href="' . $cache['DeepLink'] . '">' . $this->escape($cache['DeepLink']) . '</a></p>';
 
         if ($values['includeCacheDescription']) {
             $description .= '<hr />';
-            $description .= '<h5>' . $this->locale['HEADER_LAB_DESCRIPTION'] . '</h5>';
+            $description .= '<h5>' . $this->escape($this->locale['HEADER_LAB_DESCRIPTION']) . '</h5>';
             $description .= '<p><img src="' . $cache['KeyImageUrl'] . '" /></p>';
-            $description .= '<p>' . $cache['Description'] . '</p>';
+            $description .= '<p>' . $this->escape($cache['Description']) . '</p>';
         }
 
         $stage = 1;
         foreach ($cache['GeocacheSummaries'] as $wpt) {
             $description .= '<hr />';
-            $description .= '<h4>' . $this->getWaypointTitle($cache, $values, $wpt, $stage) . '</h4>';
+            $description .= '<h4>' . $this->escape($this->getWaypointTitle($cache, $values, $wpt, $stage)) . '</h4>';
+            if (isset($wpt['GeofencingRadius'])) {
+                $description .= '<p>' . $this->escape($this->locale['HEADER_GEOFENCING_RADIUS']) . ': ' . $wpt['GeofencingRadius'] . 'm</p>';
+            }
 
             if ($values['includeQuestion']) {
-                $description .= '<p>' . $this->locale['HEADER_QUESTION'] . ':<br />' . $wpt['Question'] . '</p>';
+                $description .= '<p>' . $this->escape($this->locale['HEADER_QUESTION_TYPE']) . ': ' . $this->escape($this->locale['HEADER_QUESTION_TYPE_VALUE'][(int) $wpt['ChallengeType']]) . '</p>';
+                $description .= '<p>' . $this->escape($this->locale['HEADER_QUESTION']) . ':<br />' . $this->escape($wpt['Question']) . '</p>';
             }
 
             if ($values['includeWaypointDescription']) {
                 $description .= '<hr />';
-                $description .= '<h5>' . $this->locale['HEADER_WAYPOINT_DESCRIPTION'] . '</h5>';
+                $description .= '<h5>' . $this->escape($this->locale['HEADER_WAYPOINT_DESCRIPTION']) . '</h5>';
                 $description .= '<p><img src="' . $wpt['KeyImageUrl'] . '" /></p>';
-                $description .= '<p>' . $wpt['Description'] . '</p>';
+                $description .= '<p>' . $this->escape($wpt['Description']) . '</p>';
             }
 
             if ($values['includeAwardMessage']) {
                 if ($wpt['AwardImageUrl'] || $wpt['CompletionAwardMessage']) {
                     $description .= '<hr />';
-                    $description .= '<h5>' . $this->locale['HEADER_AWARD'] . '</h5>';
+                    $description .= '<h5>' . $this->escape($this->locale['HEADER_AWARD']) . '</h5>';
                 }
                 if ($wpt['AwardImageUrl']) {
                     $description .= '<p><img src="' . $wpt['AwardImageUrl'] . '" /></p>';
                 }
                 if ($wpt['CompletionAwardMessage']) {
-                    $description .= '<p>' . $this->locale['HEADER_AWARD_MESSAGE'] . ':<br />' . $wpt['CompletionAwardMessage'] . '</p>';
+                    $description .= '<p>' . $this->escape($this->locale['HEADER_AWARD_MESSAGE']) . ':<br />' . $this->escape($wpt['CompletionAwardMessage']) . '</p>';
                 }
             }
             $stage++;
         }
 
-        return $this->cleanupWaypointDescription($description);
+        return $description;
     }
 
     protected function getWaypointTitle(array $cache, array $values, array $wpt, int $stage): string

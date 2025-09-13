@@ -13,55 +13,59 @@ class GpxExporter extends AbstractExporter
         return htmlentities($s, ENT_XML1);
     }
 
-    protected function cleanupWaypointDescription(string $description): string
+    protected function escape(string $string): string
     {
         // remove non printable chars https://github.com/mirsch/lab2gpx/issues/10
-        return preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $description);
+        $string = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $string);
+        return htmlentities($string);
     }
-
     protected function getWaypointDescription(array $cache, array $values, array $wpt): string
     {
-        $description = '<h3>' . $cache['Title'] . '</h3>';
+        $description = '<h3>' . $this->escape($cache['Title']) . '</h3>';
         if (isset($wpt['Title'])) {
-            $description .= '<h4>' . $wpt['Title'] . '</h4>';
+            $description .= '<h4>' . $this->escape($wpt['Title']) . '</h4>';
         }
         if ($cache['IsLinear']) {
-            $description .= '<p><span style="background:#990000;color:#fff;border-radius:5px;padding:3px 5px;">' . $this->locale['TAG_LINEAR'] . '</span></p>';
+            $description .= '<p><span style="background:#990000;color:#fff;border-radius:5px;padding:3px 5px;">' . $this->escape($this->locale['TAG_LINEAR']) . '</span></p>';
         }
-        $description .= '<p><a href="' . $cache['DeepLink'] . '">' . $cache['DeepLink'] . '</a></p>';
+        $description .= '<p><a href="' . $cache['DeepLink'] . '">' . $this->escape($cache['DeepLink']) . '</a></p>';
+        if (isset($wpt['GeofencingRadius'])) {
+            $description .= '<p>' . $this->escape($this->locale['HEADER_GEOFENCING_RADIUS']) . ': ' . $wpt['GeofencingRadius'] . 'm</p>';
+        }
 
         if ($values['includeQuestion'] && isset($wpt['Question'])) {
-            $description .= '<p>' . $this->locale['HEADER_QUESTION'] . ':<br />' . $wpt['Question'] . '</p>';
+            $description .= '<p>' . $this->escape($this->locale['HEADER_QUESTION_TYPE']) . ': ' . $this->escape($this->locale['HEADER_QUESTION_TYPE_VALUE'][(int) $wpt['ChallengeType']]) . '</p>';
+            $description .= '<p>' . $this->escape($this->locale['HEADER_QUESTION']) . ':<br />' . $this->escape($wpt['Question']) . '</p>';
         }
 
         if ($values['includeWaypointDescription'] && isset($wpt['Description'])) {
             $description .= '<hr />';
-            $description .= '<h5>' . $this->locale['HEADER_WAYPOINT_DESCRIPTION'] . '</h5>';
+            $description .= '<h5>' . $this->escape($this->locale['HEADER_WAYPOINT_DESCRIPTION']) . '</h5>';
             $description .= '<p><img src="' . $wpt['KeyImageUrl'] . '" /></p>';
-            $description .= '<p>' . $wpt['Description'] . '</p>';
+            $description .= '<p>' . $this->escape($wpt['Description']) . '</p>';
         }
 
         if ($values['includeCacheDescription']) {
             $description .= '<hr />';
-            $description .= '<h5>' . $this->locale['HEADER_LAB_DESCRIPTION'] . '</h5>';
+            $description .= '<h5>' . $this->escape($this->locale['HEADER_LAB_DESCRIPTION']) . '</h5>';
             $description .= '<p><img src="' . $cache['KeyImageUrl'] . '" /></p>';
-            $description .= '<p>' . $cache['Description'] . '</p>';
+            $description .= '<p>' . $this->escape($cache['Description']) . '</p>';
         }
 
         if ($values['includeAwardMessage'] && $wpt) {
             if ($wpt['AwardImageUrl'] || $wpt['CompletionAwardMessage']) {
                 $description .= '<hr />';
-                $description .= '<h5>' . $this->locale['HEADER_AWARD'] . '</h5>';
+                $description .= '<h5>' . $this->escape($this->locale['HEADER_AWARD']) . '</h5>';
             }
             if ($wpt['AwardImageUrl']) {
                 $description .= '<p><img src="' . $wpt['AwardImageUrl'] . '" /></p>';
             }
             if ($wpt['CompletionAwardMessage']) {
-                $description .= '<p>' . $this->locale['HEADER_AWARD_MESSAGE'] . ':<br />' . $wpt['CompletionAwardMessage'] . '</p>';
+                $description .= '<p>' . $this->escape($this->locale['HEADER_AWARD_MESSAGE']) . ':<br />' . $this->escape($wpt['CompletionAwardMessage']) . '</p>';
             }
         }
 
-        return $this->cleanupWaypointDescription($description);
+        return $description;
     }
 
     public function export(array $fetchedLabs, array $values, array $ownersToSkip): string
