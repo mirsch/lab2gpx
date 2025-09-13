@@ -201,6 +201,7 @@ $values = [
     'limit' => 300,
     'cacheType' => $cacheTypes[0],
     'prefix' => 'LC',
+    'stageSeparator' => true,
     'linear' => 'default',
 
     'includeQuestion' => true,
@@ -237,7 +238,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $values['includeAwardMessage'] = false;
 
     try {
-        $coordinates = CoordinateFactory::fromString($values['coordinates']);
+        $coordinates = CoordinateFactory::fromString((string) $values['coordinates']);
     } catch (Throwable $throwable) {
         $errors['coordinates'] = $LANG['INVALID_COORDINATES'];
     }
@@ -259,7 +260,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $values['cacheType'] = $cacheTypes[0];
     }
 
-    if (strlen($values['prefix']) > 3 || strlen($values['prefix']) < 1) {
+    if (strlen((string) $values['prefix']) > 3 || strlen((string) $values['prefix']) < 1) {
         $errors['prefix'] = $LANG['INVALID_PREFIX'];
     }
 
@@ -485,6 +486,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php if (isset($errors['prefix'])) {
                     echo '<p class="error">' . $errors['prefix'] . '</p>';
                 } ?>
+            </div>
+
+            <div class="form-row">
+                <input type="hidden" name="stageSeparator" value="0">
+                <input type="checkbox" name="stageSeparator"<?php echo($values['stageSeparator'] ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_STAGE_SEPARATOR']; ?>
             </div>
 
             <div class="form-row">

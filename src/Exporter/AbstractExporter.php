@@ -86,6 +86,11 @@ abstract class AbstractExporter
 
         $LabCode = new LabCode($this->databaseDir);
         $fixedPart = $LabCode->uuid2LabCode($cache['Id']);
-        return strtoupper($prefix) . $fixedPart . ($stage ? ('-' . $stage) : '');
+        $sep = '-';
+        if (!$values['stageSeparator']) {
+            $sep = '';
+        }
+
+        return strtoupper($prefix) . $fixedPart . ($stage ? ($sep . $stage) : '');
     }
 }
