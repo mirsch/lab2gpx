@@ -101,7 +101,8 @@ class GpxWaypointExporter extends GpxExporter
                         <gsak:UserFlag>false</gsak:UserFlag>
                         <gsak:Guid>' . $cache['Id'] . '</gsak:Guid>
                         <gsak:DNF>false</gsak:DNF>
-                        <gsak:FTF>false</gsak:FTF>';
+                        <gsak:FTF>false</gsak:FTF>
+                        <gsak:StagesTotalCount>' . $cache['StagesTotalCount'] . '</gsak:StagesTotalCount>';
             if ($values['linear'] === 'corrected' && $cache['IsLinear']) {
                 $xml .= '
                         <gsak:LatBeforeCorrect>' . $lat . '</gsak:LatBeforeCorrect>
