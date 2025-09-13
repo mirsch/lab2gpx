@@ -259,7 +259,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $values['cacheType'] = $cacheTypes[0];
     }
 
-    if (strlen($values['prefix']) > 3 || strlen($values['prefix']) < 2) {
+    if (strlen($values['prefix']) > 3 || strlen($values['prefix']) < 1) {
         $errors['prefix'] = $LANG['INVALID_PREFIX'];
     }
 

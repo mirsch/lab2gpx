@@ -62,7 +62,7 @@ $LANG['CURRENT_POSITION'] = 'find my current position';
 $LANG['BROWSER_NO_LOCATION'] = 'Geolocation is not supported by your browser.';
 $LANG['LABEL_UUIDS_TO_EXCLUDE'] = 'UUIDs to exclude (<a href="https://github.com/mirsch/lab2gpx/issues/44" target="_blank">#44</a>)';
 $LANG['META_DESCRIPTION'] = 'Generates GPX files (PQ) for Geocaching Adventure Labs';
-$LANG['INVALID_PREFIX'] = 'The prefix must be 2-3 characters long';
+$LANG['INVALID_PREFIX'] = 'The prefix must be 1-3 characters long';
 $LANG['LABEL_PREFIX'] = 'Code prefix ("AL" if using c:geo)';
 $LANG['LABEL_LINEAR'] = 'Linear Adventure Labs';
 $LANG['LINEAR_TYPE_DEFAULT'] = 'Default';
