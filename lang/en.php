@@ -68,7 +68,7 @@ $LANG['LABEL_UUIDS_TO_EXCLUDE'] = 'UUIDs to exclude (<a href="https://github.com
 $LANG['META_DESCRIPTION'] = 'Generates GPX files (PQ) for Geocaching Adventure Labs';
 $LANG['INVALID_PREFIX'] = 'The prefix must be 1-3 characters long';
 $LANG['LABEL_PREFIX'] = 'Code prefix ("AL" if using c:geo)';
-$LANG['LABEL_STAGE_SEPARATOR'] = 'Add separator before stage suffix ("LCxxxx-01")';
+$LANG['LABEL_STAGE_SEPARATOR'] = 'Add separator before stage suffix ("LCxxxx-1")';
 $LANG['LABEL_LINEAR'] = 'Linear Adventure Labs';
 $LANG['LINEAR_TYPE_DEFAULT'] = 'Default';
 $LANG['LINEAR_TYPE_FIRST'] = 'Include only first/next station';

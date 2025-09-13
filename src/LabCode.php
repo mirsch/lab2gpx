@@ -27,7 +27,7 @@ class LabCode
         $stmt = $pdo->prepare("INSERT INTO lab_codes (uuid) VALUES (:uuid)");
         $stmt->execute(['uuid' => $uuid]);
         $id = $pdo->lastInsertId();
-        $labCode = $this->convertToBase31((int)$id);
+        $labCode = self::convertToBase31((int)$id);
 
         $stmt = $pdo->prepare("UPDATE lab_codes SET lab_code = :lab_code WHERE id = :id");
         $stmt->execute(['lab_code' => $labCode, 'id' => $id]);
@@ -36,7 +36,7 @@ class LabCode
         return $labCode;
     }
 
-    private function convertToBase31(int $id): string
+    public static function convertToBase31(int $id): string
     {
         $base31 = '';
         $alphabet = '0123456789ABCDEFGHJKMNPQRTVWXYZ'; // Base 31 alphabet without 'ILOSU' (like GC Code)

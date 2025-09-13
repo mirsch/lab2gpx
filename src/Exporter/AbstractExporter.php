@@ -91,6 +91,8 @@ abstract class AbstractExporter
             $sep = '';
         }
 
+        $stage = $LabCode::convertToBase31($stage);
+
         return strtoupper($prefix) . $fixedPart . ($stage ? ($sep . $stage) : '');
     }
 }

@@ -202,6 +202,7 @@ $values = [
     'cacheType' => $cacheTypes[0],
     'prefix' => 'LC',
     'stageSeparator' => true,
+    'stageAsBase31' => true,
     'linear' => 'default',
 
     'includeQuestion' => true,
