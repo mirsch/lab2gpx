@@ -94,7 +94,7 @@ class GpxWaypointExporter extends GpxExporter
                     <urlname>' . $this->gpxEncode($cache['Title']) . '</urlname>
                     <sym>Geocache' . ($fetchedCache['IsComplete'] || $cache['IsComplete'] ? ' Found' : '') . '</sym>
                     <type>Geocache|' . $values['cacheType'] . '</type>';
-            $xml .= '<gsak:wptExtension xmlns:gsak="http://www.gsak.net/xmlv1/5">
+            $xml .= '<gsak:wptExtension xmlns:gsak="http://www.gsak.net/xmlv1/6">
                         <gsak:Code>' . $code . '</gsak:Code>
                         <gsak:IsPremium>false</gsak:IsPremium>
                         <gsak:FavPoints>0</gsak:FavPoints>
@@ -155,7 +155,7 @@ class GpxWaypointExporter extends GpxExporter
                             <desc>' . $this->gpxEncode($waypointTitle) . '</desc>
                             <sym>Virtual Stage</sym>
                             <type>Waypoint|Virtual Stage</type>
-                            <gsak:wptExtension xmlns:gsak="http://www.gsak.net/xmlv1/4">
+                            <gsak:wptExtension xmlns:gsak="http://www.gsak.net/xmlv1/6">
                                 <gsak:Parent>' . $code . '</gsak:Parent>
                             </gsak:wptExtension>
                           </wpt>';

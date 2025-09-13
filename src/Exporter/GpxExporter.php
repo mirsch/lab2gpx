@@ -111,7 +111,7 @@ class GpxExporter extends AbstractExporter
                     <urlname>S' . $displayStage . ' ' . $this->gpxEncode($cache['Title']) . '</urlname>
                     <sym>Geocache' . ($fetchedCache['IsComplete'] || $wpt['IsComplete'] ? ' Found' : '') . '</sym>
                     <type>Geocache|' . $values['cacheType'] . '</type>';
-                $xml .= '<gsak:wptExtension xmlns:gsak="http://www.gsak.net/xmlv1/5">
+                $xml .= '<gsak:wptExtension xmlns:gsak="http://www.gsak.net/xmlv1/6">
                         <gsak:Code>' . $code . '</gsak:Code>
                         <gsak:IsPremium>false</gsak:IsPremium>
                         <gsak:FavPoints>0</gsak:FavPoints>
