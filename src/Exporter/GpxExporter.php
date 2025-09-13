@@ -118,7 +118,8 @@ class GpxExporter extends AbstractExporter
                         <gsak:UserFlag>false</gsak:UserFlag>
                         <gsak:Guid>' . $wpt['Id'] . '</gsak:Guid>
                         <gsak:DNF>false</gsak:DNF>
-                        <gsak:FTF>false</gsak:FTF>';
+                        <gsak:FTF>false</gsak:FTF>
+                        <gsak:StagesTotalCount>' . $cache['StagesTotalCount'] . '</gsak:StagesTotalCount>';
                 if ($values['linear'] === 'corrected' && $cache['IsLinear']) {
                     $xml .= '
                         <gsak:LatBeforeCorrect>' . $lat . '</gsak:LatBeforeCorrect>
