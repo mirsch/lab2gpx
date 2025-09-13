@@ -74,7 +74,6 @@ class GpxWaypointExporter extends GpxExporter
                     <name>Adventure Labs</name>
                     <desc>(HasChildren)</desc>
                 ';
-        $id = -1;
         foreach ($fetchedLabs as $fetchedCache) {
             $cache = $this->getFileCache($fetchedCache);
             if (! $this->includeCache($cache, $values, $ownersToSkip)) {
@@ -110,7 +109,7 @@ class GpxWaypointExporter extends GpxExporter
             }
             $xml .= '
                     </gsak:wptExtension>';
-            $xml .= '<groundspeak:cache id="' . $id . '" available="True" archived="False" xmlns:groundspeak="http://www.groundspeak.com/cache/1/0/1">
+            $xml .= '<groundspeak:cache available="True" archived="False" xmlns:groundspeak="http://www.groundspeak.com/cache/1/0/1">
                         <groundspeak:name>' . $this->gpxEncode($cache['Title']) . '</groundspeak:name>
                         <groundspeak:placed_by>' . $this->gpxEncode($cache['OwnerUsername']) . '</groundspeak:placed_by>
                         <groundspeak:owner>' . $this->gpxEncode($cache['OwnerUsername']) . '</groundspeak:owner>
@@ -161,7 +160,6 @@ class GpxWaypointExporter extends GpxExporter
                           </wpt>';
 
                 $stage++;
-                $id--;
             }
         }
 

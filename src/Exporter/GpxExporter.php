@@ -74,7 +74,6 @@ class GpxExporter extends AbstractExporter
                 <gpx xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" creator="Groundspeak Pocket Query" xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd http://www.groundspeak.com/cache/1/0/1 http://www.groundspeak.com/cache/1/0/1/cache.xsd" xmlns="http://www.topografix.com/GPX/1/0">
                     <name>Adventure Labs</name>
                 ';
-        $id = -1;
         foreach ($fetchedLabs as $fetchedCache) {
             $cache = $this->getFileCache($fetchedCache);
             if (! $this->includeCache($cache, $values, $ownersToSkip)) {
@@ -127,7 +126,7 @@ class GpxExporter extends AbstractExporter
                 }
                 $xml .= '
                     </gsak:wptExtension>';
-                $xml .= '<groundspeak:cache id="' . $id . '" available="True" archived="False" xmlns:groundspeak="http://www.groundspeak.com/cache/1/0/1">
+                $xml .= '<groundspeak:cache available="True" archived="False" xmlns:groundspeak="http://www.groundspeak.com/cache/1/0/1">
                         <groundspeak:name>' . $this->gpxEncode($waypointTitle) . '</groundspeak:name>
                         <groundspeak:placed_by>' . $this->gpxEncode($cache['OwnerUsername']) . '</groundspeak:placed_by>
                         <groundspeak:owner>' . $this->gpxEncode($cache['OwnerUsername']) . '</groundspeak:owner>
@@ -147,7 +146,6 @@ class GpxExporter extends AbstractExporter
                 </wpt>';
 
                 $stage++;
-                $id--;
 
                 if ($cache['IsLinear'] && $values['linear'] === 'first') {
                     break;
