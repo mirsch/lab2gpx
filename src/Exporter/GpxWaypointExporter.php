@@ -26,6 +26,9 @@ class GpxWaypointExporter extends GpxExporter
             if (isset($wpt['GeofencingRadius'])) {
                 $description .= '<p>' . $this->escape($this->locale['HEADER_GEOFENCING_RADIUS']) . ': ' . $wpt['GeofencingRadius'] . 'm</p>';
             }
+            if (isset($cache['StagesTotalCount'])) {
+                $description .= '<p>' . $this->escape($this->locale['HEADER_STAGES_COUNT']) . ': ' . $cache['StagesTotalCount'] . '</p>';
+            }
 
             if ($values['includeQuestion']) {
                 $description .= '<p>' . $this->escape($this->locale['HEADER_QUESTION_TYPE']) . ': ' . $this->escape($this->locale['HEADER_QUESTION_TYPE_VALUE'][(int) $wpt['ChallengeType']]) . '</p>';
@@ -100,8 +103,7 @@ class GpxWaypointExporter extends GpxExporter
                         <gsak:UserFlag>false</gsak:UserFlag>
                         <gsak:Guid>' . $cache['Id'] . '</gsak:Guid>
                         <gsak:DNF>false</gsak:DNF>
-                        <gsak:FTF>false</gsak:FTF>
-                        <gsak:StagesTotalCount>' . $cache['StagesTotalCount'] . '</gsak:StagesTotalCount>';
+                        <gsak:FTF>false</gsak:FTF>';
             if ($values['linear'] === 'corrected' && $cache['IsLinear']) {
                 $xml .= '
                         <gsak:LatBeforeCorrect>' . $lat . '</gsak:LatBeforeCorrect>

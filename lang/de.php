@@ -32,6 +32,7 @@ $LANG['HEADER_LAB_DESCRIPTION'] = 'Beschreibung des Adventure Labs';
 $LANG['HEADER_AWARD'] = 'Tagebucheinträge';
 $LANG['HEADER_AWARD_MESSAGE'] = 'Journal Text';
 $LANG['HEADER_GEOFENCING_RADIUS'] = 'Radius';
+$LANG['HEADER_STAGES_COUNT'] = 'Stationen';
 $LANG['ERROR_ZIP_FAILED'] = 'Oh, da ging was schief. Datei konnte nicht erzeugt werden.';
 $LANG['INTRO'] = '
     <p>Dieses Tool generiert eine GPX Datei mit Geocaching Adventure Labs für diverse Geocaching Apps und Garmin GPS Geräte.</p>
