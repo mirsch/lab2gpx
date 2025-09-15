@@ -6,17 +6,27 @@ class GpxWaypointExporter extends GpxExporter
 {
     protected function getCacheDescription(array $cache, array $values): string
     {
+        $gccodes = [];
+        $linkedCacheDescription = $this->findAndLinkGcCodes($cache['Description'], $gccodes);
+
         $description = '<h3>' . $this->escape($cache['Title']) . '</h3>';
         if ($cache['IsLinear']) {
             $description .= '<p><span style="background:#990000;color:#fff;border-radius:5px;padding:3px 5px;">' . $this->escape($this->locale['TAG_LINEAR']) . '</span></p>';
         }
         $description .= '<p><a href="' . $cache['DeepLink'] . '">' . $this->escape($cache['DeepLink']) . '</a></p>';
 
+        if (count($gccodes)) {
+            $linkedCodes = array_map(function($s){
+                return '<a href="https://coord.info/' . $s . '" target="_blank">' . $s . '</a>';
+            }, $gccodes);
+            $description .= '<p>' . $this->escape($this->locale['HEADER_POSSIBLY_BONUS']) . ': ' . implode(', ', $linkedCodes) . '</p>';
+        }
+
         if ($values['includeCacheDescription']) {
             $description .= '<hr />';
             $description .= '<h5>' . $this->escape($this->locale['HEADER_LAB_DESCRIPTION']) . '</h5>';
             $description .= '<p><img src="' . $cache['KeyImageUrl'] . '" /></p>';
-            $description .= '<p>' . $this->escape($cache['Description']) . '</p>';
+            $description .= '<p>' . $this->escape($linkedCacheDescription) . '</p>';
         }
 
         $stage = 1;

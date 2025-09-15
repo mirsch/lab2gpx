@@ -33,6 +33,7 @@ $LANG['HEADER_AWARD'] = 'Award Information';
 $LANG['HEADER_AWARD_MESSAGE'] = 'Award Message';
 $LANG['HEADER_GEOFENCING_RADIUS'] = 'Radius';
 $LANG['HEADER_STAGES_COUNT'] = 'Stages';
+$LANG['HEADER_POSSIBLY_BONUS'] = 'Possibly bonus';
 $LANG['ERROR_ZIP_FAILED'] = 'Sorry, some thing went wrong. File not created.';
 $LANG['INTRO'] = '
     <p>This tool generates a GPX file containing Geocaching Adventure Labs for use in several Geocaching Apps and Garmin GPS devices.</p>

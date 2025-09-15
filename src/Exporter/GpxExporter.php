@@ -21,6 +21,10 @@ class GpxExporter extends AbstractExporter
     }
     protected function getWaypointDescription(array $cache, array $values, array $wpt): string
     {
+        $gccodes = [];
+        $linkedCacheDescription = $this->findAndLinkGcCodes($cache['Description'], $gccodes);
+        $linkedWptDescription = $this->findAndLinkGcCodes($wpt['Description'], $gccodes);
+
         $description = '<h3>' . $this->escape($cache['Title']) . '</h3>';
         if (isset($wpt['Title'])) {
             $description .= '<h4>' . $this->escape($wpt['Title']) . '</h4>';
@@ -35,6 +39,12 @@ class GpxExporter extends AbstractExporter
         if (isset($cache['StagesTotalCount'])) {
             $description .= '<p>' . $this->escape($this->locale['HEADER_STAGES_COUNT']) . ': ' . $cache['StagesTotalCount'] . '</p>';
         }
+        if (count($gccodes)) {
+            $linkedCodes = array_map(function($s){
+                return '<a href="https://coord.info/' . $s . '" target="_blank">' . $s . '</a>';
+            }, $gccodes);
+            $description .= '<p>' . $this->escape($this->locale['HEADER_POSSIBLY_BONUS']) . ': ' . implode(', ', $linkedCodes) . '</p>';
+        }
 
         if ($values['includeQuestion'] && isset($wpt['Question'])) {
             $description .= '<p>' . $this->escape($this->locale['HEADER_QUESTION_TYPE']) . ': ' . $this->escape($this->locale['HEADER_QUESTION_TYPE_VALUE'][(int) $wpt['ChallengeType']]) . '</p>';
@@ -45,14 +55,14 @@ class GpxExporter extends AbstractExporter
             $description .= '<hr />';
             $description .= '<h5>' . $this->escape($this->locale['HEADER_WAYPOINT_DESCRIPTION']) . '</h5>';
             $description .= '<p><img src="' . $wpt['KeyImageUrl'] . '" /></p>';
-            $description .= '<p>' . $this->escape($wpt['Description']) . '</p>';
+            $description .= '<p>' . $this->escape($linkedWptDescription) . '</p>';
         }
 
         if ($values['includeCacheDescription']) {
             $description .= '<hr />';
             $description .= '<h5>' . $this->escape($this->locale['HEADER_LAB_DESCRIPTION']) . '</h5>';
             $description .= '<p><img src="' . $cache['KeyImageUrl'] . '" /></p>';
-            $description .= '<p>' . $this->escape($cache['Description']) . '</p>';
+            $description .= '<p>' . $this->escape($linkedCacheDescription) . '</p>';
         }
 
         if ($values['includeAwardMessage'] && $wpt) {
