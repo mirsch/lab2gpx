@@ -6,13 +6,14 @@ use App\LabCode;
 
 abstract class AbstractExporter
 {
-    protected array $usedCodes = [];
+    protected LabCode $labCode;
 
     public function __construct(
         private readonly string $cacheDir,
         private readonly string $databaseDir,
         protected readonly array $locale,
     ) {
+        $this->labCode = new LabCode($this->databaseDir);
     }
 
     abstract public function export(array $fetchedLabs, array $values, array $ownersToSkip): string;
@@ -71,8 +72,24 @@ abstract class AbstractExporter
         return $waypointTitle;
     }
 
+    protected function getCustomCode(array $cache, array $values, int $stage): string
+    {
+        $marker = [
+            '%CODE%' => $this->labCode->uuid2LabCode($cache['Id']),
+            '%STAGE_10%' => str_pad((string) $stage, 2, '0', STR_PAD_LEFT),
+            '%STAGE_31%' => $this->labCode->convertToBase31($stage),
+            '%UUID%' => $cache['Id'],
+        ];
+
+        return str_ireplace(array_keys($marker), array_values($marker), $values['customCodeTemplate']);
+    }
+
     protected function getCode(array $cache, array $values, int $stage, bool $useStageAsPrefix = false): string
     {
+        if ($values['customCodeTemplate']) {
+            return $this->getCustomCode($cache, $values, $stage);
+        }
+
         $stage = $stage ? str_pad((string) $stage, 2, '0', STR_PAD_LEFT) : 0;
         $prefix = $values['prefix'];
         if ($useStageAsPrefix) {
@@ -84,14 +101,13 @@ abstract class AbstractExporter
             $stage = 0;
         }
 
-        $LabCode = new LabCode($this->databaseDir);
-        $fixedPart = $LabCode->uuid2LabCode($cache['Id']);
+        $fixedPart = $this->labCode->uuid2LabCode($cache['Id']);
         $sep = '-';
         if (!$values['stageSeparator']) {
             $sep = '';
         }
 
-        $stage = $LabCode::convertToBase31($stage);
+        $stage = $this->labCode->convertToBase31($stage);
 
         return strtoupper($prefix) . $fixedPart . ($stage ? ($sep . $stage) : '');
     }

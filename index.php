@@ -205,6 +205,7 @@ $values = [
     'prefix' => 'LC',
     'stageSeparator' => true,
     'stageAsBase31' => true,
+    'customCodeTemplate' => '',
     'linear' => 'default',
 
     'includeQuestion' => true,
@@ -266,6 +267,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (strlen((string) $values['prefix']) > 3 || strlen((string) $values['prefix']) < 1) {
         $errors['prefix'] = $LANG['INVALID_PREFIX'];
     }
+
+    $values['customCodeTemplate'] = trim((string) $values['customCodeTemplate']);
 
     if (!$values['userGuid'] || preg_match('/[^a-fA-F0-9-]+/', $values['userGuid'])) {
         $errors['guid'] = $LANG['INVALID_GUID'];
@@ -494,6 +497,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-row">
                 <input type="hidden" name="stageSeparator" value="0">
                 <input type="checkbox" name="stageSeparator"<?php echo($values['stageSeparator'] ? ' checked="checked"' : ''); ?> /> <?php echo $LANG['LABEL_STAGE_SEPARATOR']; ?>
+            </div>
+
+            <div class="form-row<?php echo(isset($errors['customCodeTemplate']) ? ' error' : ''); ?>">
+                <label for="customCodeTemplate">Custom Code Template (experimental, leave empty if you don't know. See <a href="https://github.com/mirsch/lab2gpx/wiki/Custom-Code-Templates" target="_blank">Wiki</a>):</label>
+                <input type="text" id="customCodeTemplate" name="customCodeTemplate" value="<?php echo htmlspecialchars((string) $values['customCodeTemplate']); ?>"/>
+                <?php if (isset($errors['customCodeTemplate'])) {
+                    echo '<p class="error">' . $errors['customCodeTemplate'] . '</p>';
+                } ?>
             </div>
 
             <div class="form-row">
