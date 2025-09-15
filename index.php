@@ -131,6 +131,9 @@ function fetchLabs(Coordinate $coordinates, array $values, array &$fetchedLabs, 
         }
         $details = fetch($url);
         $details = json_decode($details, true);
+        if (!isset($details['Id'])) {
+            continue;
+        }
         if ($config['save_debug_files']) {
             file_put_contents($file, json_encode($details, JSON_PRETTY_PRINT));
         }
@@ -143,8 +146,7 @@ function fetchLabs(Coordinate $coordinates, array $values, array &$fetchedLabs, 
     }
 
     $total = (int) $labCaches['TotalCount'];
-    if (count($fetchedLabs) < $total) {
-        @set_time_limit(10);
+    if (count($fetchedLabs) < $total && $take < $total) {
         fetchLabs($coordinates, $values, $fetchedLabs, $skip + $take);
     }
 }
