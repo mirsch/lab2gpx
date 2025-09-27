@@ -4,7 +4,7 @@ import SearchBar from './components/SearchBar.vue'
 import SettingsModal from './components/SettingsModal.vue'
 import { type Coordinates } from '@/interfaces/Coordinates.ts'
 import MapView from '@/components/MapView.vue'
-import { useSettings } from '@/composables/useSettings.ts'
+import { useSettings, hasStoredSettings } from '@/composables/useSettings.ts'
 import DownloadModal from '@/components/DownloadModal.vue';
 import { useDownload } from '@/composables/useDownload.ts';
 import HelpModal from '@/components/HelpModal.vue';
@@ -14,6 +14,9 @@ const settings = useSettings();
 const showSettings = ref(false);
 const {showDownloader, triggerDownload } = useDownload();
 const showHelpModal = ref(true);
+if (hasStoredSettings()) {
+    showHelpModal.value = false;
+}
 
 const coords = toRef(settings.value, 'coordinates');
 const radius = toRef(settings.value, 'radius');
