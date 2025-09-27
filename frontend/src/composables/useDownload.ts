@@ -56,6 +56,9 @@ export function useDownload() {
                     }
                     throw new Error(msg);
                 }
+                if (data.message) {
+                    throw new Error(data.message);
+                }
                 throw new Error('Unexpected JSON result.');
             }
 
