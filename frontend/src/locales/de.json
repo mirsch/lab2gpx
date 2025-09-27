@@ -54,7 +54,8 @@
         },
         "quirks": {
             "legend": "Quirks & Fixes",
-            "l4ctype": "Geocache Type Fix für L4C"
+            "l4ctype": "Geocache Type Fix für L4C",
+            "bom2csv": "BOM zur cachetur.no CSV Datei hinzufügen (für Excel)"
         },
         "download": {
             "legend": "Download",

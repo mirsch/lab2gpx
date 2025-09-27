@@ -291,6 +291,9 @@ watch(
                 <div class="form-row">
                     <label> <input v-model="form.quirksL4Ctype" type="checkbox" /> {{t('settings.quirks.l4ctype')}}</label>
                 </div>
+                <div class="form-row">
+                    <label> <input v-model="form.quirksBomForCsv" type="checkbox" /> {{t('settings.quirks.bom2csv')}}</label>
+                </div>
             </fieldset>
 
             <fieldset>

@@ -37,6 +37,7 @@ interface Settings {
     excludeUuids: string|null;
 
     quirksL4Ctype: boolean;
+    quirksBomForCsv: boolean;
 
     outputFormat: 'zippedgpx' | 'gpx' | 'zippedgpxwpt' | 'gpxwpt' | 'cacheturdotno';
 }

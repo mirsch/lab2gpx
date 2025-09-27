@@ -40,6 +40,7 @@ export function useSettings() {
         excludeUuids: null,
 
         quirksL4Ctype: false,
+        quirksBomForCsv: false,
 
         outputFormat: 'zippedgpx',
     })

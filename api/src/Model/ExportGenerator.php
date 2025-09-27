@@ -67,10 +67,16 @@ class ExportGenerator
                 break;
         }
 
-        return $this->twig->render($template, [
+        $file = $this->twig->render($template, [
             'settings' => $settings,
             'adventureLabs' => $labs,
         ]);
+
+        if ($this->settings->quirksBomForCsv && $this->settings->outputFormat === OutputFormat::CACHETURDOTNO) {
+            $file = "\xEF\xBB\xBF" . $file;
+        }
+
+        return $file;
     }
 
     /** @return array<mixed>|null */

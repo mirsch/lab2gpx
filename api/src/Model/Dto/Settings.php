@@ -103,6 +103,7 @@ class Settings implements GroupSequenceProviderInterface
     }
 
     public bool $quirksL4Ctype = false;
+    public bool $quirksBomForCsv = false;
     public OutputFormat $outputFormat = OutputFormat::ZIPPED_GPX;
 
     public function getGroupSequence(): array|GroupSequence
