@@ -25,8 +25,8 @@ class Settings implements GroupSequenceProviderInterface
     public Coordinates $coordinates;
 
     #[Assert\NotBlank]
-    #[Assert\GreaterThanOrEqual(1)]
-    public int $radius = 15;
+    #[Assert\GreaterThan(0)]
+    public float $radius = 15;
 
     #[Assert\NotBlank]
     #[Assert\GreaterThanOrEqual(0)]

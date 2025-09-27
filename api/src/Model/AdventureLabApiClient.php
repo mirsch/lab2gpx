@@ -123,7 +123,7 @@ class AdventureLabApiClient
      */
     public function searchV4(
         Coordinates $coordinates,
-        int $radius,
+        float $radius,
         array $completionStatuses,
         string|null $userGuid,
         int $skip = 0,
@@ -131,7 +131,7 @@ class AdventureLabApiClient
     ): array {
         $data = [
             'Origin' => ['Latitude' => $coordinates->lat, 'Longitude' => $coordinates->lon],
-            'RadiusInMeters' => $radius * 1000,
+            'RadiusInMeters' => ceil($radius * 1000),
             'skip' => $skip,
             'take' => $take,
         ];

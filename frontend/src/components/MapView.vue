@@ -40,7 +40,7 @@ function onClick(e: LeafletMouseEvent) {
         <LMarker :lat-lng="[props.center.lat, props.center.lon] as LatLngExpression" />
         <LCircle
             :lat-lng="[props.center.lat, props.center.lon] as LatLngExpression"
-            :radius="props.radius * 1000"
+            :radius="Math.ceil(props.radius * 1000)"
             :color="'#2B82CB'"
             :weight="2"
             :fillColor="'#2B82CB'"
