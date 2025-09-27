@@ -1,0 +1,96 @@
+{
+    "language": "Sprache",
+    "ok": "Ok",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "save_and_download": "Speichern und Downloaden",
+    "settings": {
+        "header": "Einstellungen",
+        "general": {
+            "legend": "Allgemein",
+            "limit": "Max. Anzahl",
+            "limit_hint": "0 = kein Limit, ACHTUNG: der Download kann ohne Limit sehr sehr lange dauern und auch mit timeout abbrechen. ggf. Radius verkleinern oder Limit passend wählen",
+            "cache_type": "Cache Typ",
+            "cache_type_hint": "Garmin GPS Geräte unterstützen keine Adventure Labs. Vielleicht willst du sie lieber als Virtuelle- oder Event Caches exportieren.",
+            "linear_label": "Lineare Adventure Labs",
+            "linear": {
+                "default": "Standard",
+                "first": "Nur die erste/nächste Station",
+                "mark": "Markieren mit [L] im Namen",
+                "corrected": "als korrigierte Koordinaten",
+                "ignore": "Ausschließen"
+            }
+        },
+        "code": {
+            "legend": "Code",
+            "prefix": "Präfix",
+            "prefix_hint": "\"AL\" für c:geo",
+            "stage_separator": "Trennzeichen vor Stage-Suffix (\"LCxxxx-1\")",
+            "custom_code_template": "Custom Code Template",
+            "custom_code_template_hint": "leer lassen für automatisch. Siehe <a href=\"https://github.com/mirsch/lab2gpx/wiki/Custom-Code-Templates\" target=\"_blank\">Wiki</a>:"
+        },
+        "personalization": {
+            "legend": "Personalisierung",
+            "user_guid": "Öffentliche GUID für den API-Abruf",
+            "user_guid_hint": "Rufe die Seite <a href=\"https://www.geocaching.com/find/default.aspx\" target=\"_blank\">https://www.geocaching.com/find/default.aspx</a> auf und suche nach deinem Benutzername. Die GUID findest du am Ende der URL nach der Suche. (...?guid=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx)",
+            "completed": "Komplett abgeschlossene Labs einschließen",
+            "partial": "Teilweise abgeschlossene Labs einschließen",
+            "not_started":  "Nicht begonnene Labs einschließen"
+        },
+        "description": {
+            "legend": "Beschreibung",
+            "include_question": "Frage zur Station in Beschreibung einfügen",
+            "include_waypoint_description": "Beschreibung der Station in Cache Beschreibung einfügen",
+            "include_adventure_lab_description": "Beschreibung des Adventure Labs in Cache Beschreibung einfügen"
+        },
+        "exclude": {
+            "legend": "Ausschließen",
+            "owner": "nach Owner Name ausschließen",
+            "owner_hint": "Trennung durch neue Zeile, Komma or Semikolon",
+            "name": "nach Adventure Lab name ausschließen",
+            "name_hint": "Trennung durch neue Zeile, Komma or Semikolon. Schließt Labs aus, deren Name Teile der genannten Wörter enthalten",
+            "uuids": "UUIDs ausschließen",
+            "uuids_hint": "Erweiterte Funktion, nur verwenden, wenn du weißt, was es admit auf sich hat.\n Siehe <a href=\"https://github.com/mirsch/lab2gpx/issues/44\">#44</a>"
+        },
+        "quirks": {
+            "legend": "Quirks & Fixes",
+            "l4ctype": "Geocache Type Fix für L4C"
+        },
+        "download": {
+            "legend": "Download",
+            "format_label": "Ausgabeformat",
+            "format": {
+            "zippedgpx": "Gezipptes GPX",
+            "gpx": "GPX",
+            "zippedgpxwpt": "Gezipptes GPX mit Wegpunkten",
+            "gpxwpt": "GPX mit Wegpunkten",
+            "cacheturdotno": "Cachetur.no Bulk Add Waypoints"
+            }
+        },
+        "validation": {
+            "check": "Es sind Fehler aufgetreten. Bitte prüfe deine Einstellungen.",
+            "limit": "Zahl >= 0",
+            "prefix": "1-3 Zeichen"
+        }
+    },
+    "downloader": {
+        "please_wait": "Download, bitte warten…",
+        "wait": [
+            "Das kann eine Weile dauern.",
+            "Nicht die Gedult verlieren.",
+            "Der Weg ist das Ziel.",
+            "Gleich geschafft.",
+            "Nur noch ein paar Byte."
+        ]
+    },
+    "search": {
+        "locate": {
+            "not_available": "Dein Browser unterstützt keine Geolocation.",
+            "no_position": "Position konnte nicht ermittelt werden.",
+            "current_position": "Aktuelle Position"
+        },
+        "coordinates": "Koordinaten/Ort",
+        "coordinates_placeholder": "Suche nach Koordinaten oder Ort…",
+        "radius": "Radius in km"
+    }
+}

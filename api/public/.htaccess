@@ -1,0 +1,20 @@
+# CORS
+Header always set "Access-Control-Allow-Origin" "*"
+Header always set "Access-Control-Allow-Methods" "POST, GET, PUT, DELETE, PATCH, OPTIONS"
+Header always set "Access-Control-Allow-Headers" "origin, accept, content-type, content-disposition, host, access-control-allow-origin, x-requested-with"
+Header always set "Access-Control-Expose-Headers" "content-type, content-disposition, content-encoding"
+Header always set "Access-Control-Allow-Credentials" "true"
+
+# CORB
+Header always set "X-Content-Type-Options" "nosniff"
+
+RewriteEngine On
+RewriteBase "/"
+
+# bei OPTIONS direkt zurück damit wir das nicht in Symfony in jeder Route definieren müssen
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.*)$ $1 [R=204,L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-l
+RewriteRule ^(.*)$ /index.php

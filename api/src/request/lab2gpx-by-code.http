@@ -1,0 +1,3 @@
+@code = 118Q
+
+GET http://localhost:8080/lab2gpx-data/by-code/{{code}}

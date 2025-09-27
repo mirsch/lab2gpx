@@ -1,6 +1,2 @@
 .idea
 data
-debug
-*.log
-vendor
-config.local.php

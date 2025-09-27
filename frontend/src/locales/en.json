@@ -1,0 +1,96 @@
+{
+    "language": "Language",
+    "ok": "Ok",
+    "cancel": "Cancel",
+    "save": "Save",
+    "save_and_download": "Save and Download",
+    "settings": {
+        "header": "Settings",
+        "general": {
+            "legend": "General",
+            "limit": "Limit",
+            "limit_hint": "0 = no limit. WARNING: the download may take a very long time without a limit and may also be aborted due to a timeout. If necessary, reduce the radius or choose a suitable limit.",
+            "cache_type": "Cache Type",
+            "cache_type_hint": "Garmin GPS devices do not support Adventure Labs. You probably want to export them as virtual or event caches.",
+            "linear_label": "Linear Adventure Labs",
+            "linear": {
+                "default": "Default",
+                "first": "Include only first/next stage",
+                "mark": "Mark using [L] in title",
+                "corrected": "As corrected coordinates",
+                "ignore": "Ignore"
+            }
+        },
+        "code": {
+            "legend": "Code",
+            "prefix": "Prefix",
+            "prefix_hint": "\"AL\" if using c:geo",
+            "stage_separator": "Add separator before stage suffix (\"LCxxxx-1\")",
+            "custom_code_template": "Custom Code Template",
+            "custom_code_template_hint": "leave empty for automatic. See <a href=\"https://github.com/mirsch/lab2gpx/wiki/Custom-Code-Templates\" target=\"_blank\">Wiki</a>:"
+        },
+        "personalization": {
+            "legend": "Personalization",
+            "user_guid": "Calling user's public GUID",
+            "user_guid_hint": "Go to <a href=\"https://www.geocaching.com/find/default.aspx\" target=\"_blank\">https://www.geocaching.com/find/default.aspx</a> and look up your own username to find this. The GUID is included at the end of the URL of the resulting page. (...?guid=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx)<br />Leave empty if you don't care about found state",
+            "completed": "Include fully completed labs",
+            "partial": "Include partially completed labs",
+            "not_started":  "Include unstarted labs"
+        },
+        "description": {
+            "legend": "Description",
+            "include_question": "Include Waypoint question in Cache description",
+            "include_waypoint_description": "Include description of the Waypoint in Cache description",
+            "include_adventure_lab_description": "Include the description of the Adventure Lab in the Cache description"
+        },
+        "exclude": {
+            "legend": "Exclude",
+            "owner": "Exclude by Owner name",
+            "owner_hint": "Separated by new line, comma or semicolon",
+            "name": "Exclude by Adventure Lab name",
+            "name_hint": "Separated by new line, comma or semicolon. Excludes names that contain the entered words",
+            "uuids": "UUIDs to exclude",
+            "uuids_hint": "Advanced feature, use only if you know what you are doing. See <a href=\"https://github.com/mirsch/lab2gpx/issues/44\">#44</a> for details"
+        },
+        "quirks": {
+            "legend": "Quirks & Fixes",
+            "l4ctype": "Geocache Type Fix for L4C"
+        },
+        "download": {
+            "legend": "Download",
+            "format_label": "Output Format",
+            "format": {
+                "zippedgpx": "Zipped GPX",
+                "gpx": "GPX",
+                "zippedgpxwpt": "Zipped GPX with Waypoints",
+                "gpxwpt": "GPX with Waypoints",
+                "cacheturdotno": "Cachetur.no Bulk Add Waypoints"
+            }
+        },
+        "validation": {
+            "check": "There are errors. Please check double check your settings",
+            "limit": "Number >= 0",
+            "prefix": "1-3 Chars"
+        }
+    },
+    "downloader": {
+        "please_wait": "Downloading, please wait...",
+        "wait": [
+            "This may take a while.",
+            "Don't lose patience.",
+            "The journey is the destination.",
+            "Almost there.",
+            "Just a few more bytes."
+        ]
+    },
+    "search": {
+        "locate": {
+            "not_available": "You Browser does not support Geolocation.",
+            "no_position": "Position could not be determined.",
+            "current_position": "Current position"
+        },
+        "coordinates": "Coordinates/Location",
+        "coordinates_placeholder": "Search for coordinates or location…",
+        "radius": "Radius in km"
+    }
+}

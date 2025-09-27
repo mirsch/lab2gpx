@@ -1,0 +1,11 @@
+twig:
+    file_name_pattern: '*.twig'
+    default_path: '%kernel.project_dir%/templates'
+
+    paths:
+        '%kernel.project_dir%/templates_custom': ''
+        '%kernel.project_dir%/templates': 'base'
+
+when@test:
+    twig:
+        strict_variables: true

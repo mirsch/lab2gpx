@@ -1,0 +1,69 @@
+{%- macro getWaypointTitle(settings, adventureLab, wpt, stage) -%}
+    {%- if adventureLab.IsLinear and settings.linear == constant('App\\Model\\Dto\\Linear::MARK') %}[L] {% endif -%}
+    S{{ formatStageForDisplay(stage, adventureLab) }} {{ wpt.Title }}
+{%- endmacro -%}
+
+{% block description %}
+    <h3>{{ adventureLab.Title }}</h3>
+
+    {% if adventureLab.IsLinear %}
+        <p><span style="background:#990000;color:#fff;border-radius:5px;padding:3px 5px;">
+        {{ 'TAG_LINEAR' | trans }}
+        </span></p>
+    {% endif %}
+
+    <p><a href="{{ adventureLab.DeepLink }}" target="_blank">{{ adventureLab.DeepLink }}</a></p>
+
+    {% if adventureLab.StagesTotalCount is defined %}
+        <p>{{ 'HEADER_STAGES_COUNT' | trans }}: {{ adventureLab.StagesTotalCount }}</p>
+    {% endif %}
+
+    {% if adventureLab.LAB2GPX_GCCodes | length  %}
+        <p>{{ 'HEADER_POSSIBLY_BONUS' | trans }}:
+            {% for gccode in adventureLab.LAB2GPX_GCCodes %}
+                <a href="https://coord.info/{{ gccode }}" target="_blank">{{ gccode }}</a>{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+    {% endif %}
+
+    {% if settings.includeCacheDescription and adventureLab.LAB2GPX_Description %}
+        <hr />
+        <h5>{{ 'HEADER_LAB_DESCRIPTION' | trans }}</h5>
+        <p><img src="{{ adventureLab.KeyImageUrl }}" /></p>
+        <p>{{ adventureLab.LAB2GPX_Description }}</p>
+    {% endif %}
+
+    {% set stage = 0 %}
+    {% for wpt in adventureLab.GeocacheSummaries %}
+        {% set stage = stage + 1 %}
+        {% block waypoint_description %}
+        <hr />
+        <h4>{{ _self.getWaypointTitle(settings, adventureLab, wpt, stage) }}</h4>
+
+        {% if wpt.GeofencingRadius is defined %}
+            <p>{{ 'HEADER_GEOFENCING_RADIUS' | trans }}: {{ wpt.GeofencingRadius }}m</p>
+        {% endif %}
+
+        {% if settings.includeQuestion and wpt.Question is defined %}
+            <p>{{ 'HEADER_QUESTION_TYPE' | trans }}:
+                {% if wpt.ChallengeType == 0 %}
+                    {{ 'HEADER_QUESTION_TYPE_VALUE_SINGLE' | trans }}
+                {% elseif wpt.ChallengeType == 1 %}
+                    {{ 'HEADER_QUESTION_TYPE_VALUE_MULTIPLE_CHOICE' | trans }}
+                {% else %}
+                    {{ wpt.ChallengeType }}
+                {% endif %}
+            </p>
+            <p>{{ 'HEADER_QUESTION' | trans }}:<br />{{ wpt.Question }}</p>
+        {% endif %}
+
+        {% if settings.includeWaypointDescription and wpt.LAB2GPX_Description %}
+            <hr />
+            <h5>{{ 'HEADER_WAYPOINT_DESCRIPTION' | trans }}</h5>
+            <p><img src="{{ wpt.KeyImageUrl }}" /></p>
+            <p>{{ wpt.LAB2GPX_Description }}</p>
+        {% endif %}
+
+        {% endblock %}
+    {% endfor %}
+{% endblock %}

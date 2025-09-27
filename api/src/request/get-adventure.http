@@ -1,0 +1,14 @@
+# @id = faa22f38-03c8-4668-9e5d-2eb207d86a1a
+
+# archived?
+# @id = 772a3606-938c-4cf0-9825-6145f837b787
+# @id = 22cf8713-cf42-47cc-8bb2-153aa7f77261
+@id = 11031bb8-4e98-4c96-b5cd-439f8fe3bb93
+
+# youtube video in description
+# @id = 13661e6b-3047-4c03-b166-3dcc91745268
+
+# youtube video in award message
+# @id = 6f448e07-633d-47b1-a133-d3ebeb94dbe5
+
+GET http://localhost:8080/adventure-lab/adventure/{{id}}

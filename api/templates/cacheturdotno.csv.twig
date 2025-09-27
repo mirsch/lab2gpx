@@ -1,0 +1,26 @@
+{%- macro getWaypointTitle(settings, adventureLab, wpt, stage) -%}
+    {%- autoescape false -%}
+    {%- if adventureLab.IsLinear and settings.linear == constant('App\\Model\\Dto\\Linear::MARK') %}[L] {% endif -%}
+    {{ adventureLab.Title }} : S{{ formatStageForDisplay(stage, adventureLab) }} {{ wpt.Title }}
+    {%- endautoescape -%}
+{%- endmacro -%}
+{%- autoescape 'csv' -%}
+{# @var settings \App\Model\Dto\Settings #}
+{# @var adventureLab array #}
+{%- for adventureLab in adventureLabs -%}
+    {%- set stage = 0 -%}
+    {%- set stagesIncluded = 0 -%}
+    {%- for wpt in adventureLab.GeocacheSummaries -%}
+        {%- set stage = stage + 1 -%}
+        {# next two conditions are a bit odd but the is no continue or break in twig #}
+        {%- if not shouldSkipStage(settings, wpt) -%}
+            {%- if not adventureLab.IsLinear or settings.linear != constant('App\\Model\\Dto\\Linear::FIRST') or stagesIncluded == 0 -%}
+                {%- set stagesIncluded = stagesIncluded + 1 -%}
+                {%- set code = getCode(settings, adventureLab, stage) -%}
+                {%- set title = _self.getWaypointTitle(settings, adventureLab, wpt, stage) -%}
+                {{ code }};lab;{{ decimalMinutes(wpt.Location.Latitude, wpt.Location.Longitude) }};{{ title|e('csv') }}{{ "\n" }}
+            {%- endif -%}
+        {%- endif -%}
+    {%- endfor -%}
+{%- endfor -%}
+{%- endautoescape -%}

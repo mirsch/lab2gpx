@@ -1,0 +1,3 @@
+@uuid = f59886ec-6902-40fc-a717-86933c27ac6e
+
+GET http://localhost:8080/lab2gpx-data/by-uuid/{{uuid}}

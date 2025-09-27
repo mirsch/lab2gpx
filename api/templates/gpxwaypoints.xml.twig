@@ -1,0 +1,81 @@
+{% autoescape 'xml' %}
+<?xml version="1.0" encoding="utf-8"?>
+<gpx xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" creator="Lab2Gpx" xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd http://www.groundspeak.com/cache/1/0/1 http://www.groundspeak.com/cache/1/0/1/cache.xsd" xmlns="http://www.topografix.com/GPX/1/0">
+    <name>Adventure Labs</name>
+    <desc>(HasChildren)</desc>
+    {# @var settings \App\Model\Dto\Settings #}
+    {# @var adventureLab array #}
+    {% for adventureLab in adventureLabs %}
+        {% set code = getCode(settings, adventureLab, 0) %}
+        <wpt lat="{{ adventureLab.Location.Latitude }}" lon="{{ adventureLab.Location.Longitude }}">
+            <time>{{ adventureLab.PublishedUtc }}</time>
+            <name>{{ code }}</name>
+            <desc>{{ adventureLab.Title }}</desc>
+            <url>{{ adventureLab.DeepLink }}</url>
+            <urlname>{{ adventureLab.Title }}</urlname>
+            <sym>Geocache{% if adventureLab.IsComplete %} Found{% endif %}</sym>
+            <type>Geocache|{{ settings.cacheType.value }}</type>
+            <gsak:wptExtension xmlns:gsak="http://www.gsak.net/xmlv1/6">
+                <gsak:Code>{{ code }}</gsak:Code>
+                <gsak:IsPremium>false</gsak:IsPremium>
+                <gsak:FavPoints>0</gsak:FavPoints>
+                <gsak:UserFlag>false</gsak:UserFlag>
+                <gsak:Guid>{{ adventureLab.Id }}</gsak:Guid>
+                <gsak:DNF>false</gsak:DNF>
+                <gsak:FTF>false</gsak:FTF>
+                {% if adventureLab.IsLinear and settings.linear == constant('App\\Model\\Dto\\Linear::CORRECTED') %}
+                    <gsak:LatBeforeCorrect>' . {{ adventureLab.Location.Latitude }} . '</gsak:LatBeforeCorrect>
+                    <gsak:LonBeforeCorrect>' . {{ adventureLab.Location.Longitude }} . '</gsak:LonBeforeCorrect>
+                {% endif %}
+            </gsak:wptExtension>
+            <groundspeak:cache available="True" archived="False" xmlns:groundspeak="http://www.groundspeak.com/cache/1/0/1">
+                <groundspeak:name>{{ adventureLab.Title }}</groundspeak:name>
+                <groundspeak:placed_by>{{ adventureLab.OwnerUsername }}</groundspeak:placed_by>
+                <groundspeak:owner>{{ adventureLab.OwnerUsername }}</groundspeak:owner>
+                <groundspeak:type>{% if settings.quirksL4Ctype %}Geocache|{% endif %}{{ settings.cacheType.value }}</groundspeak:type>
+                <groundspeak:container>Virtual</groundspeak:container>
+                <groundspeak:attributes />
+                <groundspeak:difficulty>1</groundspeak:difficulty>
+                <groundspeak:terrain>1</groundspeak:terrain>
+                <groundspeak:country />
+                <groundspeak:state />
+                <groundspeak:short_description html="True" />
+                <groundspeak:long_description html="True">
+                    {% set description %}
+                        {% include 'partials/description-waypoints.html.twig' %}
+                    {% endset %}
+                    {# without manual escaping it is not escaped at all, with escaping it's escaped twice? so we use the raw result of the manually escaped description #}
+                    {{ description|e('xml')|raw }}
+                </groundspeak:long_description>
+                <groundspeak:encoded_hints />
+                <groundspeak:logs />
+                <groundspeak:travelbugs />
+            </groundspeak:cache>
+        </wpt>
+        {% set stage = 0 %}
+        {% set stagesIncluded = 0 %}
+        {% for wpt in adventureLab.GeocacheSummaries %}
+            {% set stage = stage + 1 %}
+            {# next two conditions are a bit odd but the is no continue or break in twig #}
+            {% if not shouldSkipStage(settings, wpt) %}
+                {% if not adventureLab.IsLinear or settings.linear != constant('App\\Model\\Dto\\Linear::FIRST') or stagesIncluded == 0 %}
+                    {% set stagesIncluded = stagesIncluded + 1 %}
+                    {% set wptCode = getCode(settings, adventureLab, stage, true) %}
+                    <wpt lat="{{ wpt.Location.Latitude }}" lon="{{ wpt.Location.Longitude }}">
+                        <time>{{ adventureLab.PublishedUtc }}</time>
+                        <name>{{ wptCode }}</name>
+                        <cmt>{{ wpt.Question }}</cmt>
+                        <url>{{ adventureLab.DeepLink }}</url>
+                        <desc>{{ formatStageForDisplay(stage, adventureLab) }} {{ wpt.Title }}</desc>
+                        <sym>Virtual Stage</sym>
+                        <type>Waypoint|Virtual Stage</type>
+                        <gsak:wptExtension xmlns:gsak="http://www.gsak.net/xmlv1/6">
+                            <gsak:Parent>{{ code }}</gsak:Parent>
+                        </gsak:wptExtension>
+                    </wpt>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+</gpx>
+{% endautoescape %}
