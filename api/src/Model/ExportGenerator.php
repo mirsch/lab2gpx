@@ -34,6 +34,9 @@ use const JSON_PRETTY_PRINT;
 
 class ExportGenerator
 {
+    private const int COMPLETED_PARTIAL = 1;
+    private const int COMPLETED_FULL = 0;
+
     private Settings $settings;
 
     public function __construct(
@@ -170,6 +173,14 @@ class ExportGenerator
         return $adventureLab;
     }
 
+    /** @param array<mixed> $adventureLab */
+    private function setWaypointsFound(array &$adventureLab): void
+    {
+        foreach ($adventureLab['GeocacheSummaries'] as $k => $geocacheSummary) {
+            $adventureLab['GeocacheSummaries'][$k]['IsComplete'] = true;
+        }
+    }
+
     /** @param array<mixed> $labs */
     private function fetchLabs(array &$labs, int $skip = 0): void
     {
@@ -188,15 +199,15 @@ class ExportGenerator
                 continue;
             }
 
-            $fileCacheEnabled = true;
             // partially complete, we can only get this if you call this using a user guid, so do not cache this Adventure Lab result
-            if ($adventureLabSearchItem['CompletionStatus'] === 1) {
-                $fileCacheEnabled = false;
-            }
-
-            if ($fileCacheEnabled) {
+            if ($adventureLabSearchItem['CompletionStatus'] !== self::COMPLETED_PARTIAL) {
                 $cachedLab = $this->getCachedAdventureLab($adventureLabSearchItem['Id']);
                 if ($cachedLab) {
+                    // if cached and fully complete, we have to correct completion state in cached result
+                    if ($adventureLabSearchItem['CompletionStatus'] === self::COMPLETED_FULL) {
+                        $this->setWaypointsFound($cachedLab);
+                    }
+
                     $labs[] = $cachedLab;
                     continue;
                 }
@@ -205,7 +216,11 @@ class ExportGenerator
             @set_time_limit(10);
 
             try {
-                $adventureLab = $this->adventureLabApiClient->getAdventureById($adventureLabSearchItem['Id'], $this->settings->userGuid);
+                if ($adventureLabSearchItem['CompletionStatus'] === self::COMPLETED_PARTIAL) {
+                    $adventureLab = $this->adventureLabApiClient->getAdventureById($adventureLabSearchItem['Id'], $this->settings->userGuid);
+                } else {
+                    $adventureLab = $this->adventureLabApiClient->getAdventureById($adventureLabSearchItem['Id'], null);
+                }
             } catch (BadGatewayHttpException $exception) {
                 if ($exception->getCode() === BadGatewayHttpException::POSSIBLE_ARCHIVED) {
                     continue;
@@ -221,7 +236,7 @@ class ExportGenerator
 
             $adventureLab = $this->enrichAdventureLab($adventureLab);
 
-            if ($fileCacheEnabled) {
+            if ($adventureLabSearchItem['CompletionStatus'] !== self::COMPLETED_PARTIAL) {
                 $this->saveCachedAdventureLab($adventureLab);
             }
 
