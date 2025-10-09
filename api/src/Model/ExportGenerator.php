@@ -241,7 +241,7 @@ class ExportGenerator
             }
 
             if ($adventureLabSearchItem['CompletionStatus'] === self::COMPLETED_FULL) {
-                $this->setWaypointsFound($cachedLab);
+                $this->setWaypointsFound($adventureLab);
             }
 
             if ($this->shouldSkipAdventureLab($adventureLab)) {
