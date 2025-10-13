@@ -209,6 +209,10 @@ class ExportGenerator
                         $this->setWaypointsFound($cachedLab);
                     }
 
+                    if ($this->shouldSkipAdventureLab($cachedLab)) {
+                        continue;
+                    }
+
                     $labs[] = $cachedLab;
                     continue;
                 }
