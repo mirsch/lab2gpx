@@ -176,6 +176,7 @@ class ExportGenerator
     /** @param array<mixed> $adventureLab */
     private function setWaypointsFound(array &$adventureLab): void
     {
+        $adventureLab['IsComplete'] = true;
         foreach ($adventureLab['GeocacheSummaries'] as $k => $geocacheSummary) {
             $adventureLab['GeocacheSummaries'][$k]['IsComplete'] = true;
         }
