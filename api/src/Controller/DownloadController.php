@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use ZipStream\ZipStream;
@@ -40,11 +41,17 @@ class DownloadController extends AbstractController
     #[Route('/download', methods: ['POST'])]
     public function downloadAction(Request $request): Response
     {
+        $json = $request->getContent();
+        // GSAK's PostUrl() can only send Content-Type: application/x-www-form-urlencoded
+        if ($request->getContentTypeFormat() === 'form') {
+            $json = json_encode($request->request->all());
+        }
         try {
             $settings = $this->serializer->deserialize(
-                $request->getContent(),
+                $json,
                 Settings::class,
                 'json',
+                [AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => $request->getContentTypeFormat() === 'form']
             );
         } catch (NotNormalizableValueException $e) {
             return $this->json(
