@@ -24,7 +24,8 @@ class RequestLogger
         $request = $event->getRequest();
         $this->logger->info(
             sprintf(
-                '%s %s',
+                '%s %s %s',
+                $request->getClientIp(),
                 $request->getMethod(),
                 $request->getRequestUri(),
             ),
