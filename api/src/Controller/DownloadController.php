@@ -22,6 +22,7 @@ use ZipStream\ZipStream;
 use function basename;
 use function count;
 use function implode;
+use function json_encode;
 use function pathinfo;
 use function sprintf;
 use function str_contains;
@@ -46,12 +47,13 @@ class DownloadController extends AbstractController
         if ($request->getContentTypeFormat() === 'form') {
             $json = json_encode($request->request->all());
         }
+
         try {
             $settings = $this->serializer->deserialize(
                 $json,
                 Settings::class,
                 'json',
-                [AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => $request->getContentTypeFormat() === 'form']
+                [AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => $request->getContentTypeFormat() === 'form'],
             );
         } catch (NotNormalizableValueException $e) {
             return $this->json(
