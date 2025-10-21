@@ -1,6 +1,7 @@
 monolog:
     channels:
         - deprecation # Deprecations are logged in the dedicated "deprecation" channel when it exists
+        - apirequest
 
 when@dev:
     monolog:
@@ -22,6 +23,11 @@ when@dev:
                 type: console
                 process_psr_3_messages: false
                 channels: ["!event", "!doctrine", "!console"]
+            apirequest:
+                type: stream
+                path: '%env(resolve:LOGS_DIR)%/apirequest.log'
+                level: info
+                channels: [ 'apirequest' ]
 
 when@test:
     monolog:
@@ -60,3 +66,8 @@ when@prod:
                 channels: [deprecation]
                 path: php://stderr
                 formatter: monolog.formatter.json
+            apirequest:
+                type: stream
+                path: '%env(resolve:LOGS_DIR)%/apirequest.log'
+                level: info
+                channels: [ 'apirequest' ]

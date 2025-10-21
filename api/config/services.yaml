@@ -37,3 +37,8 @@ services:
         class: App\Model\AdventureLabDatabase
         arguments:
             $dataDir: '%env(resolve:DATA_DIR)%'
+
+    App\EventListener\RequestLogger:
+        arguments: [ '@monolog.logger.apirequest' ]
+        tags:
+            - { name: 'kernel.event_listener', event: 'kernel.request', method: 'onKernelRequest' }
