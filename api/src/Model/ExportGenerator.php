@@ -54,7 +54,11 @@ class ExportGenerator
         $this->settings = $settings;
         $this->localeProvider->setLocale($settings->locale->value);
         $labs = [];
-        $this->fetchLabs($labs);
+        if ($this->settings->getNormalizedUuidsToFetch()) {
+            $this->fetchLabsByUuuids($labs);
+        } else {
+            $this->fetchLabs($labs);
+        }
 
         switch ($settings->outputFormat) {
             case OutputFormat::GPX:
@@ -262,5 +266,54 @@ class ExportGenerator
         }
 
         $this->fetchLabs($labs, $skip + $take);
+    }
+
+    /** @param array<mixed> $labs */
+    private function fetchLabsByUuuids(array &$labs): void
+    {
+        foreach ($this->settings->getNormalizedUuidsToFetch() as $uuid) {
+            $canCache = true;
+            // if we have a user and want found or partial found we can not cache
+            if ($this->settings->userGuid && (in_array('0', $this->settings->completionStatuses) || in_array('1', $this->settings->completionStatuses))) {
+                $canCache = false;
+            }
+
+            if ($canCache) {
+                $cachedLab = $this->getCachedAdventureLab($uuid);
+                if ($cachedLab) {
+                    $labs[] = $cachedLab;
+                    continue;
+                }
+            }
+
+            @set_time_limit(10);
+
+            try {
+                if ($this->settings->userGuid) {
+                    $adventureLab = $this->adventureLabApiClient->getAdventureById($uuid, $this->settings->userGuid);
+                } else {
+                    $adventureLab = $this->adventureLabApiClient->getAdventureById($uuid, null);
+                }
+            } catch (BadGatewayHttpException $exception) {
+                if ($exception->getCode() === BadGatewayHttpException::POSSIBLE_ARCHIVED) {
+                    continue;
+                }
+
+                throw $exception;
+            }
+
+            // just a very basic test, we have at least an Id in the array and not an error message in status code 200
+            if (! isset($adventureLab['Id'])) {
+                continue;
+            }
+
+            $adventureLab = $this->enrichAdventureLab($adventureLab);
+
+            if ($canCache) {
+                $this->saveCachedAdventureLab($adventureLab);
+            }
+
+            $labs[] = $adventureLab;
+        }
     }
 }

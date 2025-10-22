@@ -62,6 +62,7 @@ class Settings implements GroupSequenceProviderInterface
     private string|null $excludeOwner = null;
     private string|null $excludeNames = null;
     private string|null $excludeUuids = null;
+    private string|null $uuidsToFetch = null;
 
     public function getExcludeOwner(): string|null
     {
@@ -102,6 +103,19 @@ class Settings implements GroupSequenceProviderInterface
         return $this;
     }
 
+    public function getUuidsToFetch(): string|null
+    {
+        return $this->uuidsToFetch;
+    }
+
+    public function setUuidsToFetch(string|null $uuids): Settings
+    {
+        $this->uuidsToFetch = $uuids;
+        $this->normalizedUuidsToFetch = null;
+
+        return $this;
+    }
+
     public bool $quirksL4Ctype = false;
     public bool $quirksBomForCsv = false;
     public OutputFormat $outputFormat = OutputFormat::ZIPPED_GPX;
@@ -138,6 +152,9 @@ class Settings implements GroupSequenceProviderInterface
 
     /** @var string[]|null */
     private array|null $normalizedExcludeUuids = null;
+
+    /** @var string[]|null */
+    private array|null $normalizedUuidsToFetch = null;
 
     /** @return string[] */
     private function splitExludeField(string $string): array
@@ -184,5 +201,17 @@ class Settings implements GroupSequenceProviderInterface
         $this->normalizedExcludeUuids = $this->excludeUuids ? $this->splitExludeField($this->excludeUuids) : [];
 
         return $this->normalizedExcludeUuids;
+    }
+
+    /** @return string[] */
+    public function getNormalizedUuidsToFetch(): array
+    {
+        if ($this->normalizedUuidsToFetch !== null) {
+            return $this->normalizedUuidsToFetch;
+        }
+
+        $this->normalizedUuidsToFetch = $this->uuidsToFetch ? $this->splitExludeField($this->uuidsToFetch) : [];
+
+        return $this->normalizedUuidsToFetch;
     }
 }

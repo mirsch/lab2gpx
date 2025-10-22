@@ -1,0 +1,25 @@
+POST http://localhost:8080/download
+Content-Type: application/json
+
+{
+    "locale": "de",
+    "coordinates": {
+        "lat": 0,
+        "lon": 0
+    },
+    "cacheType": "Lab Cache",
+    "prefix": "LC",
+    "customCodeTemaplate": null,
+    "linear": "default",
+
+    "userGuid": null,
+    "completionStatuses": ["1", "2", "0"],
+
+    "includeQuestion": true,
+    "includeWaypointDescription": true,
+    "includeCacheDescription": true,
+
+    "outputFormat": "gpx",
+
+    "uuidsToFetch": "0bd5dc20-cc2c-4023-a42a-80161772fe1f,0cc82cf0-4624-4969-857f-d363a962a1a0"
+}
