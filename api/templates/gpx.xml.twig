@@ -39,6 +39,13 @@
                                 <gsak:LonBeforeCorrect>' . {{ wpt.Location.Longitude }} . '</gsak:LonBeforeCorrect>
                             {% endif %}
                         </gsak:wptExtension>
+                        <lab2gpx:adventureLab xmlns:lab2gpx="https://lab2gpx.gcutils.de/ns/lab2gpx/1">
+                            <lab2gpx:uuid>{{ adventureLab.Id }}</lab2gpx:uuid>
+                            <lab2gpx:stagesTotal>{{ adventureLab.TotalGeocachesCount }}</lab2gpx:stagesTotal>
+                            <lab2gpx:stagesCompleted>{{ adventureLab.CompletedGeocachesCount }}</lab2gpx:stagesCompleted>
+                            <lab2gpx:themes>{{ adventureLab.AdventureThemes | join(',') }}</lab2gpx:themes>
+                            <lab2gpx:bonus>{{ adventureLab.LAB2GPX_GCCodes | join(',') }}</lab2gpx:bonus>
+                        </lab2gpx:adventureLab>
                         <groundspeak:cache id="{{ wpt.LAB2GPX_ID }}" available="True" archived="False" xmlns:groundspeak="http://www.groundspeak.com/cache/1/0/1">
                             <groundspeak:name>{{ _self.getWaypointTitle(settings, adventureLab, wpt, stage) }}</groundspeak:name>
                             <groundspeak:placed_by>{{ adventureLab.OwnerUsername }}</groundspeak:placed_by>

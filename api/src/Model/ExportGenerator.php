@@ -181,6 +181,7 @@ class ExportGenerator
     private function setWaypointsFound(array &$adventureLab): void
     {
         $adventureLab['IsComplete'] = true;
+        $adventureLab['CompletedGeocachesCount'] = $adventureLab['TotalGeocachesCount'];
         foreach ($adventureLab['GeocacheSummaries'] as $k => $geocacheSummary) {
             $adventureLab['GeocacheSummaries'][$k]['IsComplete'] = true;
         }
