@@ -14,6 +14,7 @@ use function file_exists;
 use function implode;
 use function sprintf;
 use function str_replace;
+use function time;
 
 class AdventureLabDatabase
 {
@@ -96,6 +97,31 @@ class AdventureLabDatabase
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         return $row ?: null;
+    }
+
+    public function markLabAsFailing(string $uuid, int $errorCode): void
+    {
+        $now = time();
+        $stmt = $this->getConnection()->prepare(
+            'INSERT INTO adventure_lab_errors (uuid, error_code, error_count, first_error_at, last_error_at)
+            VALUES (:uuid, :errorCode, 1, :now, :now)
+            ON CONFLICT(uuid) DO UPDATE SET error_code = excluded.error_code, error_count = error_count + 1, last_error_at = excluded.last_error_at',
+        );
+        $stmt->execute(['uuid' => $uuid, 'errorCode' => $errorCode, 'now' => $now]);
+    }
+
+    public function isLabMarkedAsFailing(string $uuid, int $retryAfterSeconds): bool
+    {
+        $stmt = $this->getConnection()->prepare('SELECT 1 FROM adventure_lab_errors WHERE uuid = :uuid AND last_error_at > :threshold');
+        $stmt->execute(['uuid' => $uuid, 'threshold' => time() - $retryAfterSeconds]);
+
+        return (bool) $stmt->fetchColumn();
+    }
+
+    public function unmarkLabAsFailing(string $uuid): void
+    {
+        $stmt = $this->getConnection()->prepare('DELETE FROM adventure_lab_errors WHERE uuid = :uuid');
+        $stmt->execute(['uuid' => $uuid]);
     }
 
     private function extractLabUrl(string $deepLink): string

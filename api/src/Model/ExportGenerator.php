@@ -37,6 +37,9 @@ class ExportGenerator
     private const int COMPLETED_PARTIAL = 1;
     private const int COMPLETED_FULL = 0;
 
+    // labs failing in labs-api with an error that affects only this lab are not requested again for this time
+    private const int FAILING_LAB_RETRY_AFTER_SECONDS = 7 * 24 * 60 * 60;
+
     private Settings $settings;
 
     public function __construct(
@@ -223,6 +226,10 @@ class ExportGenerator
                 }
             }
 
+            if ($this->labCode->isLabMarkedAsFailing($adventureLabSearchItem['Id'], self::FAILING_LAB_RETRY_AFTER_SECONDS)) {
+                continue;
+            }
+
             @set_time_limit(10);
 
             try {
@@ -232,7 +239,11 @@ class ExportGenerator
                     $adventureLab = $this->adventureLabApiClient->getAdventureById($adventureLabSearchItem['Id'], null);
                 }
             } catch (BadGatewayHttpException $exception) {
-                if ($exception->getCode() === BadGatewayHttpException::POSSIBLE_ARCHIVED) {
+                if ($exception->getCode() === BadGatewayHttpException::LODESTONE_ERROR) {
+                    $this->labCode->markLabAsFailing($adventureLabSearchItem['Id'], $exception->getCode());
+                }
+
+                if ($exception->isSkippableAdventureError()) {
                     continue;
                 }
 
@@ -244,6 +255,7 @@ class ExportGenerator
                 continue;
             }
 
+            $this->labCode->unmarkLabAsFailing($adventureLab['Id']);
             $adventureLab = $this->enrichAdventureLab($adventureLab);
 
             if ($adventureLabSearchItem['CompletionStatus'] !== self::COMPLETED_PARTIAL) {
@@ -287,6 +299,10 @@ class ExportGenerator
                 }
             }
 
+            if ($this->labCode->isLabMarkedAsFailing($uuid, self::FAILING_LAB_RETRY_AFTER_SECONDS)) {
+                continue;
+            }
+
             @set_time_limit(10);
 
             try {
@@ -296,7 +312,11 @@ class ExportGenerator
                     $adventureLab = $this->adventureLabApiClient->getAdventureById($uuid, null);
                 }
             } catch (BadGatewayHttpException $exception) {
-                if ($exception->getCode() === BadGatewayHttpException::POSSIBLE_ARCHIVED) {
+                if ($exception->getCode() === BadGatewayHttpException::LODESTONE_ERROR) {
+                    $this->labCode->markLabAsFailing($uuid, $exception->getCode());
+                }
+
+                if ($exception->isSkippableAdventureError()) {
                     continue;
                 }
 
@@ -308,6 +328,7 @@ class ExportGenerator
                 continue;
             }
 
+            $this->labCode->unmarkLabAsFailing($adventureLab['Id']);
             $adventureLab = $this->enrichAdventureLab($adventureLab);
 
             if ($canCache) {

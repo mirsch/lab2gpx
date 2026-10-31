@@ -58,10 +58,14 @@ class AdventureLabApiClient
 
         if ($response->getStatusCode() !== 200) {
             $code = 0;
+            $body = $response->getBody()->getContents();
             // the (strange) response is:
             // {"Message":"Could not adventures from AdventuresApi. Adventure 9ff5ceb0-c58b-4183-899a-1fbb1bd6c2c0 with player "}
-            if (stripos($response->getBody()->getContents(), 'Could not adventures from AdventuresApi') !== false) {
+            if (stripos($body, 'Could not adventures from AdventuresApi') !== false) {
                 $code = BadGatewayHttpException::POSSIBLE_ARCHIVED;
+            } elseif ($response->getStatusCode() === 500 && stripos($body, 'Lodestone') !== false) {
+                // some single adventures fail with a status 500 and an internal "Lodestone" error
+                $code = BadGatewayHttpException::LODESTONE_ERROR;
             }
 
             throw new BadGatewayHttpException(sprintf('Got status %d from labs-api', $response->getStatusCode()), $code);
