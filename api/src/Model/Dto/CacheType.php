@@ -9,4 +9,5 @@ enum CacheType: string
     case LAB_CACHE = 'Lab Cache';
     case VIRTUAL_CACHE = 'Virtual Cache';
     case MEGA_EVENT_CACHE = 'Mega-Event Cache';
+    case WEBCAM_CACHE = 'Webcam Cache';
 }

@@ -11,7 +11,7 @@
             "limit": "Max. Anzahl",
             "limit_hint": "0 = kein Limit, ACHTUNG: der Download kann ohne Limit sehr sehr lange dauern und auch mit timeout abbrechen. ggf. Radius verkleinern oder Limit passend wählen",
             "cache_type": "Cache Typ",
-            "cache_type_hint": "Garmin GPS Geräte unterstützen keine Adventure Labs. Vielleicht willst du sie lieber als Virtuelle- oder Event Caches exportieren.",
+            "cache_type_hint": "Garmin GPS Geräte unterstützen keine Adventure Labs. Vielleicht willst du sie lieber als Virtuelle-, Event- oder Webcam Caches exportieren.",
             "linear_label": "Lineare Adventure Labs",
             "linear": {
                 "default": "Standard",

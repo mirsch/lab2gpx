@@ -14,7 +14,7 @@ interface Settings {
     coordinates: Coordinates;
     limit: number;
 
-    cacheType: 'Lab Cache' | 'Virtual Cache' | 'Mega-Event Cache';
+    cacheType: 'Lab Cache' | 'Virtual Cache' | 'Mega-Event Cache' | 'Webcam Cache';
     linear: 'default' | 'first' | 'mark' | 'corrected' | 'ignore';
 
     // code generation

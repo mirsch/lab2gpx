@@ -125,7 +125,8 @@ watch(
                     <select id="settings-cache-type" v-model="form.cacheType">
                         <option value="Lab Cache">Lab Cache</option>
                         <option value="Virtual Cache">Virtual Cache</option>
-                        <option value="Virtual Cache">Mega-Event Cache</option>
+                        <option value="Mega-Event Cache">Mega-Event Cache</option>
+                        <option value="Webcam Cache">Webcam Cache</option>
                     </select>
                     <p class="small">{{ t('settings.general.cache_type_hint') }}</p>
                 </div>
