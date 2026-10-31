@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, defineEmits, defineProps } from 'vue'
+import { ref, computed, defineEmits, defineProps } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { LMap, LTileLayer, LMarker, LCircle, LControlZoom } from '@vue-leaflet/vue-leaflet'
 import type { LatLngExpression, LeafletMouseEvent, PointExpression } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -14,8 +15,16 @@ const emit = defineEmits<{
     (e: 'map-click', v: Coordinates): void
 }>()
 
+const { locale } = useI18n()
+
 const zoom = ref(10)
-const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+// tile.openstreetmap.org renders labels in the local language only; the German
+// OSM style (openstreetmap.de) shows German names with the local name in brackets
+const tileUrl = computed(() =>
+    locale.value === 'de'
+        ? 'https://tile.openstreetmap.de/{z}/{x}/{y}.png'
+        : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+)
 const tileAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
 
 function onClick(e: LeafletMouseEvent) {
@@ -33,7 +42,7 @@ function onClick(e: LeafletMouseEvent) {
         :options="{ zoomControl: false }"
         @click="onClick"
     >
-        <LTileLayer :url="tileUrl" :attribution="tileAttribution" />
+        <LTileLayer :key="tileUrl" :url="tileUrl" :attribution="tileAttribution" />
 
         <LControlZoom position="topright" />
 
